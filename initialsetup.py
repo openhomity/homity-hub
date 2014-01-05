@@ -1,6 +1,5 @@
 #from ConfigParser import SafeConfigParser, NoOptionError
-import couchdb
-import argparse
+import couchdb, uuid, argparse,hashlib
 from commands import getstatusoutput
 from couchdb.mapping import Document, TextField
 
@@ -46,21 +45,23 @@ def main():
     new_user = User()
     new_user.username = new_hub_username
     password = new_hub_password
-    ohomeuser.privilege = 'user'
+    new_user.privilege = 'user'
     salt = uuid.uuid4().hex
     new_user.password = hashlib.sha256(salt.encode() + password.encode()).hexdigest() + ':' + salt
 
     new_user.store(user_db)
-    print "Successfully created %s:%s" % (new_user.username, new_user.password)
+    print "Successfully created %s - %s:%s" % (new_user.id, new_user.username, new_user.password)
 
     '''
     Set up config & log files
     '''
+    print "Copying default.conf to /etc/homity/homityhub.conf"
     try:
         getstatusoutput("cp default.conf /etc/homity/homityhub.conf")
     except:
         raise Exception('Configuration file creation failed - make sure /etc/homity directory is created and owned by current user')
     
+    print "Creating log file at /var/log/homity/Hub.log"
     try:
         getstatusoutput("touch /var/log/homity/Hub.log")
     except:
