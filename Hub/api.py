@@ -68,7 +68,8 @@ if hub_config['couch_url']:
     couch = Server(url=hub_config.get('couch_url'))
     if hub_config.get('couch_username'):
         couch.resource.credentials = (hub_config.get('couch_username'), hub_config.get('couch_password'))
-
+else:
+    couch = Server(url="http://localhost:5984")
 
 @app.route('/', methods = ['GET'])
 def get_all_status():

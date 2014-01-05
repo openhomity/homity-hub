@@ -1,6 +1,7 @@
 from Hub import app
-from OpenSSL import SSL
 from Hub.api import hub_config
+if hub_config.get('ssl_enable'):
+    from OpenSSL import SSL
 
 def main():
     if hub_config.get('ssl_enable'):

@@ -1,4 +1,3 @@
-#from ConfigParser import SafeConfigParser, NoOptionError
 import couchdb, uuid, argparse,hashlib
 from commands import getstatusoutput
 from couchdb.mapping import Document, TextField
