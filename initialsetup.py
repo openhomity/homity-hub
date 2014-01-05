@@ -1,8 +1,13 @@
 #from ConfigParser import SafeConfigParser, NoOptionError
 import couchdb
-from Hub.v1.Common.User import User
 import argparse
 from commands import getstatusoutput
+from couchdb.mapping import Document, TextField
+
+class User(Document):
+    username = TextField()
+    password = TextField()
+    privilege = TextField()
 
 def main():
     parser = argparse.ArgumentParser(

@@ -18,30 +18,30 @@ hub_config_parser.read('/etc/homity/homityhub.conf')
 
 try:
     hub_config['logger_path'] = hub_config_parser.get('logger','path')
-except NoOptionError, NoSectionError:
+except (NoOptionError, NoSectionError):
     hub_config['logger_path'] = False
     
 try: 
     hub_config['couch_url'] = hub_config_parser.get('couchdb','server')
-except NoOptionError, NoSectionError:
+except (NoOptionError, NoSectionError):
     hub_config['couch_url'] = False
 try:
     hub_config['couch_username'] = hub_config_parser.get('couchdb','username')
     hub_config['couch_password'] = hub_config_parser.get('couchdb','password')
-except NoOptionError, NoSectionError:
+except (NoOptionError, NoSectionError):
     hub_config['couch_username'] = False
     hub_config['couch_password'] = False
 
 try:
     hub_config['ssl_enable'] = bool_or_string(hub_config_parser.get('ssl','enabled'))
-except NoOptionError, NoSectionError:
+except (NoOptionError, NoSectionError):
     hub_config['ssl_enable'] = False
 
 if hub_config['ssl_enable']:
     try:
         hub_config['ssl_private_key'] = hub_config_parser.get('ssl','private_key_path')
         hub_config['ssl_cert'] = hub_config_parser.get('ssl','cert_path')
-    except NoOptionError, NoSectionError:
+    except (NoOptionError, NoSectionError):
         hub_config['ssl_enable'] = False
 
 '''

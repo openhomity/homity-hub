@@ -1,5 +1,4 @@
-from couchdb.mapping import Document, TextField, IntegerField, DateTimeField, BooleanField, ListField, DictField, Mapping
-from datetime import datetime
+from couchdb.mapping import Document, TextField
 
 class User(Document):
     username = TextField()
