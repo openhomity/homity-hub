@@ -24,9 +24,10 @@ def update_crontab(object_name="", new_schedule=[]):
     cmd = "crontab -l | grep -v \"%s\"" % (object_name)
     status,cleaned_file = getstatusoutput(cmd)
     temp_crontab = open("/tmp/crontab.txt","w")
-    temp_crontab.write(str(cleaned_file))
+    if cleaned_file.split()[1] != "crontab":  # avoid "no crontab for x" issues
+        temp_crontab.write(str(cleaned_file))
+    
     #walk new_schedule and insert entries into temp crontab file
-
     temp_crontab.write("\n")
     for entry in new_schedule:
         temp_crontab.write("%s   %s  *   *   %s  %s   #%s \n" % (entry['minute'], entry['hour'], entry['days'], entry['command'],object_name))
