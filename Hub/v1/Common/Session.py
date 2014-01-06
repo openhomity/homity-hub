@@ -6,9 +6,6 @@ class Session(Document):
     user = TextField()
     privilege = TextField()
     active = BooleanField()
-    alarmST = TextField()
-    alarmDCID = TextField()
-    cameraSession = TextField()
     established = DateTimeField(default=datetime.datetime.now())
-    remoteAddr = TextField()
+    remoteAddress = TextField()
     

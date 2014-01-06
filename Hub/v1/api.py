@@ -22,34 +22,28 @@ Called once per /login
 """
 def _session_cleanup():
     app.logger.debug('Starting session cleanup')
-    sessionDB = couch['sessions']
-    oldIds = []
-    for id in sessionDB:
-        if sessionDB[id]['active'] == False or (datetime.now() - datetime.strptime(sessionDB[id]['established'], '%Y-%m-%dT%H:%M:%SZ')) > timedelta(minutes = 5):
-            oldIds.append(id)
-    for id in oldIds:
+    session_db = couch['sessions']
+    expired_sessions = []
+    for id in session_db:
+        if session_db[id]['active'] == False or (datetime.now() - datetime.strptime(session_db[id]['established'], '%Y-%m-%dT%H:%M:%SZ')) > timedelta(minutes = 5):
+            expired_sessions.append(id)
+    for id in expired_sessions:
         app.logger.debug("Deleting session %s" % id)
-        del sessionDB[id]
+        del session_db[id]
     app.logger.debug('Session cleanup complete')
-    
-def _async_logins(session, sessionDB, alarmSLT):
-    _camera_login(session, sessionDB)
-    _alarm_login(session, sessionDB, alarmSLT)
 
 """
 Login method/API, uses POST verb and expects JSON body with credentials
 Usage - POST /login -d {"username":username, "password":password}
 
-If credentials are good, all stateful logins are processed in another thread (Alarm, BlueIris), and session is created in sessionDB with -
+If credentials are good, all stateful logins are processed in another thread (Alarm, Camera), and session is created in session_db with -
 - Username & privilege level copied from users DB
 - IP of user
 - Creation time
 
 """ 
 @v1api.route('/v1/login', methods = ['POST'])
-def loginPOST():
-    global cameraInfo
-    
+def loginPOST():  
     cleanup_thread = Thread(target = _session_cleanup, args = [])
     cleanup_thread.start()
 
@@ -62,44 +56,31 @@ def loginPOST():
         app.logger.error("Missing Username or PW for login attempt, got %s" % (args))
         return make_response(json.dumps({"reason" : "MissingUserorPW"}),401)
     
-    remoteAddr = request.remote_addr
+    remote_address = request.remote_addr
     username = args['username']
     password = args['password']
-
-    quick = True
         
-    app.logger.info("Login request for user %s from %s, quick=%s" % (username, remoteAddr, quick))
-    login_result, dbprivilege, alarmSLT = _check_credentials(username, password)
+    app.logger.info("Login request for user %s from %s, quick=%s" % (username, remote_address, quick))
+    login_result, dbprivilege = _check_credentials(username, password)
     
     if login_result:
-        sessionDB = couch['sessions']
-        session = Session(user=username,privilege=dbprivilege,active=True, established=datetime.now(), remoteAddr=remoteAddr)
-        session.store(sessionDB)
-        returnInfo = {"result" : "success", "session" : session.id}
-        app.logger.info("Session created in for user %s session %s IP %s" % (username,session.id, remoteAddr))
-        currentSession = session.id
-        app.logger.debug("Starting login for camera & alarm, async=%s" % (quick))
-        if quick:
-            camera_session = ""
-            alarm_session = ""
-            async_login_thread = Thread(target = _async_logins, args = [session, sessionDB, alarmSLT])
-            async_login_thread.start()
-        else:
-            if _camera_login(session, sessionDB):
-                app.logger.debug("Camera logged in for user:%s" % (username))
-            else:
-                app.logger.debug("Camera login failed for user:%s" % (username))
-            
-            if _alarm_login(session, sessionDB, alarmSLT):
-                app.logger.debug("Alarm logged in for user:%s" % (username))
-            else:
-                app.logger.debug("Alarm login failed for user:%s" % (username))
+        session_db = couch['sessions']
+        session = Session(user=username,privilege=dbprivilege,active=True, established=datetime.now(), remoteAddress=remote_address)
+        session.store(session_db)
+        return_info = {"result" : "success", "session" : session.id}
+        app.logger.info("Session created in for user %s session %s IP %s" % (username,session.id, remote_address))
+        current_session = session.id
+        
+        def async_logins():
+            pass #add functions that need stateful login here
+        async_login_thread = Thread(target = async_logins, args = [session, session_db])
+        async_login_thread.start()
         
     else:
         app.logger.error("Bad Username or PW for user:%s" % (username))
         return make_response(json.dumps({"reason" : "BadUserorPW"}),401)
     
-    return json.dumps(returnInfo)
+    return json.dumps(return_info)
 
 """
 Logout method/API, uses POST verb and expects JSON body with session ID
@@ -113,27 +94,14 @@ Todo - figure out how to log out of alarm
 @v1api.route('/v1/logout', methods = ['POST'])
 @requires_auth
 def logoutPOST():
-    currentSession = get_session()
+    current_session = get_session()
     
-    if currentSession == "":
+    if current_session == "":
         return make_response(json.dumps({"reason" : "BadOrInactiveSession"}),401)
     
-    app.logger.debug("Logout request for session %s" % (currentSession))
-    sessionDB = couch['sessions']
-    
-    cameraSession = sessionDB[currentSession]['cameraSession']
-
-    cameraDB = couch['camera']
-    for id in cameraDB:
-        cameraObject = BlueIris.load(cameraDB,id)
-
-    cameraObject.setSession(cameraSession)
-    
-    if cameraObject.logout():
-        app.logger.debug("Camera logout successful for session %s" % (currentSession))
-    else:
-        app.logger.debug("Camera logout failed for session %s" % (currentSession))
+    app.logger.debug("Logout request for session %s" % (current_session))
+    session_db = couch['sessions']
         
-    del sessionDB[currentSession]
+    del session_db[current_session]
     
     return ""

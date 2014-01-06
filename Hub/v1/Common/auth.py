@@ -27,7 +27,7 @@ Return True if session exists, is active, within timeout period, and was created
 """ 
 def _check_session(session):
     app.logger.debug("Checking DB for session %s" % (session))
-    global currentSession
+    global current_session
     sessionDB = couch['sessions']
     if session in sessionDB:
         if sessionDB[session]['active'] == False:
@@ -38,12 +38,12 @@ def _check_session(session):
             return False
             """
             #removed check below due to GAppEngine often coming in from different IPs
-        elif sessionDB[session]['remoteAddr'] != request.remote_addr:
-            app.logger.error("Session %s was established from a different IP, original: %s, latest: %s" % (session, sessionDB[session]['remoteAddr'], request.remote_addr))
+        elif sessionDB[session]['remoteAddress'] != request.remote_addr:
+            app.logger.error("Session %s was established from a different IP, original: %s, latest: %s" % (session, sessionDB[session]['remote_address'], request.remote_addr))
             return False
             """
         else:
-            currentSession = session
+            current_session = session
             app.logger.debug("Session %s found in DB" % (session))
             return True
     else:
@@ -51,20 +51,19 @@ def _check_session(session):
         return False
     
 def _check_credentials(username, userpassword):
-    userDB = couch['users']
-    for id in userDB:
-        if userDB[id]['username'] == username:
-            dbpasswordhash, salt = userDB[id]['password'].split(':')
+    user_db = couch['users']
+    for id in user_db:
+        if user_db[id]['username'] == username:
+            dbpasswordhash, salt = user_db[id]['password'].split(':')
             userpasswordhash = sha256(salt.encode() + userpassword.encode()).hexdigest()
-            dbprivilege = userDB[id]['privilege']
-            alarmSLT = userDB[id]['alarmSLT']
+            dbprivilege = user_db[id]['privilege']
     
     if not id:
         app.logger.error("Bad user:%s" % (username))
         return False, "", ""
     
     if userpasswordhash == dbpasswordhash:
-        return True, dbprivilege, alarmSLT
+        return True, dbprivilege
     
     return False, "", ""
 
@@ -85,7 +84,7 @@ def requires_auth(f):
             if not _check_session(params['session']):
                 return make_response(json.dumps({"reason" : "BadOrInactiveSession"}),401)
         elif 'username' in list(params) and 'password' in list(params):
-            if not _check_credentials(params['username'], params['password']):
+            if not _check_credentials(params['username'], params['password'])[0]:
                 return make_response(json.dumps({"reason" : "BadUserOrPass"}),401)
         else:
             return make_response(json.dumps({"reason" : "NoAuthProvided"}),401)

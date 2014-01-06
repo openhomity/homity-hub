@@ -33,15 +33,3 @@ def update_crontab(object_name="", new_schedule=[]):
     
     temp_crontab.close()
     getstatusoutput("crontab /tmp/crontab.txt")
-
-'''
-#Clear all crontab entries for an object 
-def clear_crontab(object_name):
-    #clear existing crontab entries for this object
-    cmd = "crontab -l | grep -v \"%s\"" % (object_name)
-    status,cleaned_file = getstatusoutput(cmd)
-    temp_crontab = open("/tmp/crontab.txt","w")
-    temp_crontab.write(str(cleaned_file))
-    temp_crontab.close()
-    getstatusoutput("crontab /tmp/crontab.txt")
-'''

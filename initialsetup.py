@@ -20,13 +20,14 @@ def main():
     
     new_hub_username = args.username
     new_hub_password = args.password
-    couchdb_admin_user, couchdb_admin_pass = args.couch
+    if args.couch:
+        couchdb_admin_user, couchdb_admin_pass = args.couch
     
     '''
     Set up CouchDB
     '''
     couch = couchdb.Server(url="http://localhost:5984")
-    if couchdb_admin_user:
+    if args.couch:
         couch.resource.credentials = (couchdb_admin_user, couchdb_admin_pass)
         
     for db_name in ['users','sessions','spokes','garages','alarms','cameras','locks']:
