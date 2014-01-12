@@ -19,6 +19,8 @@ class Spoke(Document):
                 "allocated" : <True if pin is being used>
                 "digital" : <True if pin status represented as True/False, False if represented by integer>
                 "output" : <True if pin status is settable, False if readable>
+                "num" : <Spoke's identifier for pin>
+                "value" : <True|False if digital, integer if analog>
                 "schedule" : [
                     "action" : <True for turning on a digital output pin, False for turning off>
                     "minute" : <minute to perform action>

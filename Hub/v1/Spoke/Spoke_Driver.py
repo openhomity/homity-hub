@@ -3,6 +3,15 @@ from Hub.v1.Spoke.Spoke import Spoke
 
 class SpokeDriver():
     """
+    Login/Logout functions as needed.
+    """
+    def login(self, spoke):
+        pass
+    
+    def logout(self, spoke):
+        pass
+    
+    """
     Returns nested dictionary of all pins' status in format -
     {
     "3" : {"digital" : <bool-True>, "output", <bool>, "on": <bool>}

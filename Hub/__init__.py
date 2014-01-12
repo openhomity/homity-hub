@@ -8,5 +8,7 @@ from Hub.v1.api import v1api
 app.register_blueprint(v1api)
 from Hub.v1.Spoke.spoke_api import v1spoke
 app.register_blueprint(v1spoke)
+from Hub.v1.Garage.garage_api import v1garage
+app.register_blueprint(v1garage)
 
 

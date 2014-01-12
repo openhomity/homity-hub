@@ -66,6 +66,14 @@ def _get_shell_commands(pin_num, driver_info):
 
 class SpokeRestDuinoDriver(SpokeDriver):
     """
+    Login/Logout functions as needed.
+    """
+    def login(self, spoke):
+        pass
+    
+    def logout(self, spoke):
+        pass
+    """
     Returns nested dictionary of all pins' status in format -
     {
     "3" : {"digital" : <bool-True>, "output", <bool>, "on": <bool>}
