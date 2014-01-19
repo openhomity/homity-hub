@@ -13,7 +13,7 @@ def _parse_driver_info(garage):
     return driver_info
 
 def _get_garages(driver_info):
-    return _send_cmd("",driver_info)
+    return _send_cmd("GAR",driver_info)
 
 def _get_garage(garage_num, driver_info):
     return _send_cmd(garage_num,driver_info)
