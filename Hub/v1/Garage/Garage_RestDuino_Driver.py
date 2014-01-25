@@ -1,7 +1,7 @@
 import json, urllib2
 
 from Hub.v1.Garage.Garage import GarageController
-from Hub.v1.Spoke.Garage_Driver import GarageDriver
+from Hub.v1.Garage.Garage_Driver import GarageDriver
 from Hub.v1.Common.helpers import bool_or_string
 
 def _parse_driver_info(garage):
