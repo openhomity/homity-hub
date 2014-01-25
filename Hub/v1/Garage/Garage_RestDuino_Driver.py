@@ -24,10 +24,10 @@ def _set_garage(garage_num, key, value, driver_info):
     
     if key == 'open' and value in [True,False]:
         if garage_status.get('open') == (not value):
-            _garage_toggle(garage_num,driver_info)
+            return _garage_toggle(garage_num,driver_info)
             
     elif key == 'on' and value in [True,False]:
-        _set_garage_power(garage_num,value,driver_info)
+        return _set_garage_power(garage_num,value,driver_info)
     
     else:
         return False
