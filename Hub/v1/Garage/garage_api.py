@@ -169,12 +169,14 @@ def _garage_controllers_internal(garage_controller_id="",path=[], value=False):
                         garage_controller.garages[path[1]][path[2]] = value
                         garage_controller.store(garage_db)
                         return json.dumps(value)
-                    elif driver.set_garage(garage_controller,garage_controller.garages[path[1]]['num'], path[2], value):
-                        garage_controller = _update_garage_status(garage_controller)
-                        garage_controller.store(garage_db)
-                        return json.dumps(value)
-                    else:
-                        return make_response(json.dumps({"reason" : "NotImplementedPut3"}),501)
+                    elif path[2] in ["open","on"]:
+                        if driver.set_garage(garage_controller,garage_controller.garages[path[1]]['num'], path[2], value):
+                            garage_controller = _update_garage_status(garage_controller)
+                            garage_controller.store(garage_db)
+                            return json.dumps(value)
+                        else:
+                            make_response(json.dumps({"reason" : "PutError3"}),500)
+                    return make_response(json.dumps({"reason" : "NotImplementedPut3"}),501)
                 else:
                     return make_response(json.dumps({"reason" : "InvalidInputPut3"}),404)
             elif path_len == 2: #Setting driver_info - e.g. /garagecontroller/<garage_controller_id>/driver_info/<key> = value
