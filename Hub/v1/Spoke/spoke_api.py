@@ -173,6 +173,7 @@ def _spokes_internal(spoke_id="",path=[], value=False):
             return json.dumps(return_value)
         
         else:
+            value = bool_or_string(value)
             driver = _driver_name_to_class(spoke.driver)
             if path_len == 3: #Setting a pin's value - e.g. /spoke/<spoke_id>/pins/<pin_id>/<key> = value
                 if path[0] == "pins" and path[1] in list(spoke.pins):
@@ -297,8 +298,6 @@ def _pins_internal(pin_id="",path=[], value=False):
         #Find the spoke that houses this pin and pass it off to the spoke handler
         for id in spoke_db:
             spoke = Spoke.load(spoke_db,id)
-            #spoke = _update_spoke_pin_status(spoke)
-            #spoke.store(spoke_db)
             if spoke.active and pin_id in list(spoke.pins):
                 return _spokes_internal(spoke_id=id, path = ["pins", pin_id] + path, value=value)
                 

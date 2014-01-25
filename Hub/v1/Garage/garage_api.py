@@ -162,6 +162,7 @@ def _garage_controllers_internal(garage_controller_id="",path=[], value=False):
             return json.dumps(return_value)
         
         else:
+            value = bool_or_string(value)
             driver = _driver_name_to_class(garage_controller.driver)
             if path_len == 3: #Setting a garage's value - e.g. /garagecontroller/<garage_controller_id>/garages/<garage_id>/<key> = value
                 if path[0] == "garages" and path[1] in list(garage_controller.garages):
