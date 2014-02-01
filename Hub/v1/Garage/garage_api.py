@@ -370,13 +370,13 @@ def _garages_internal(garage_id="", path=None, value=False):
         Find the garage controller that houses this garage
         and pass it off to the garage controller handler
         """
-        for garage_id in garage_db:
+        for garage_controller_entry in garage_db:
             garage_controller = GarageController.load(garage_db,
-                                                      garage_id)
+                                                      garage_controller_entry)
             if (garage_controller.active and
                 garage_id in list(garage_controller.garages)):
                 return _garage_controllers_internal(
-                    garage_controller_id=garage_id,
+                    garage_controller_id=garage_controller_entry,
                     path=["garages", garage_id] + path,
                     value=value)
 
