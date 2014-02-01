@@ -170,7 +170,9 @@ def _garage_controllers_internal(
     InvalidInput strings are a trick to help see where we fell
     """
     garage_db = couch['garages']
-    path = []
+
+    if path == None:
+        path = []
 
     path_len = len(path)
     garage_controller_list = []
@@ -340,7 +342,9 @@ def _garages_internal(garage_id="", path=None, value=False):
     /garagecontroller/<garage_controller_id>/garages/<garage_id>
     """
     garage_db = couch['garages']
-    path = []
+
+    if path == None:
+        path = []
 
     garage_list = []
     garage_controller = GarageController()

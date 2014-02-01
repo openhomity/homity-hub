@@ -170,13 +170,13 @@ def _spokes_internal(spoke_id="", path=None, value=False):
     Only specific sets are allowed, enforced either here or at the driver
     InvalidInput strings are a trick to help see where we fell.
     """
+    if path == None:
+        path = []
+
     spoke_db = couch['spokes']
     path_len = len(path)
     spoke_list = []
     spoke = Spoke()
-
-    if path == None:
-        path = []
 
     if not spoke_id:
         if value:
