@@ -39,8 +39,12 @@ def update_crontab(object_name="", new_schedule=None):
     status, cleaned_file = getstatusoutput(cmd)
     temp_crontab = open("/tmp/crontab.txt", "w")
 
-    if cleaned_file.split()[1] != "crontab":
-        temp_crontab.write(str(cleaned_file))
+    try:
+        if cleaned_file.split()[1] != "crontab":
+            temp_crontab.write(str(cleaned_file))
+    except IndexError:
+        pass
+
     temp_crontab.write("\n")
 
     for entry in new_schedule:
