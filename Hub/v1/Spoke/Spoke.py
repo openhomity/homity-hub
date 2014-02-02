@@ -55,10 +55,26 @@ class Spoke(Document):
     spoke_db = couch['spokes']
     driver_class = SpokeRestDuinoDriver()
 
+    def get(self, spoke_id):
+        """Get spoke by UUID."""
+        self = self.load(spoke_id,
+                         self.spoke_db)
+        self.refresh()
+        return self
+
     def save(self):
         """Save current self."""
         return self.store(self.spoke_db)
 
+    def create(self, spoke_info):
+        """Create new spoke."""
+        self = self.__init__(name=spoke_info.get('name'),
+                            driver=spoke_info.get('driver'),
+                            active=False,
+                            pins={},
+                            driver_info=spoke_info.get('driver_info'))
+        self.refresh()
+        return self
 
     def status(self):
         """
@@ -129,7 +145,7 @@ class Spoke(Document):
                     self._add_pin(pin_num,
                                   pin)
 
-        self.store(self.spoke_db)
+        self.save()
 
     def update_pin_schedule(self, pin, driver_shell_commands):
         """

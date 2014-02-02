@@ -50,16 +50,9 @@ def new_spoke():
 
     {'name': <string>, 'driver': <string>, 'driver_info': <dict>}
     """
-    spoke_db = couch['spokes']
 
     spoke_info = request.get_json(silent=True, cache=True)
-    spoke = Spoke(name=spoke_info.get('name'),
-                  driver=spoke_info.get('driver'),
-                  active=False,
-                  pins={},
-                  driver_info=spoke_info.get('driver_info'))
-    spoke.refresh()
-    spoke.store(spoke_db)
+    spoke = Spoke.create(spoke_info)
 
     return _spokes_internal(spoke_id=spoke.id)
 
@@ -112,9 +105,8 @@ def delete_spoke(path):
 
     spoke_id = parsed_path[0]
     if len(parsed_path) == 1: #delete a spoke
-        if spoke_id in spoke_db:
-            spoke = Spoke.load(spoke_db,
-                               spoke_id)
+        spoke = Spoke.get(spoke_id)
+        if spoke:
             spoke.clear_spoke_schedule()
             del spoke_db[spoke_id]
             return ""
@@ -142,9 +134,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                                  501)
         spoke_list = []
         for spoke_entry in spoke_db:
-            spoke = Spoke.load(spoke_db,
-                               spoke_entry)
-            spoke.refresh()
+            spoke = Spoke.get(spoke_entry)
             spoke_list.append(spoke.status())
         return json.dumps(spoke_list)
     else:
@@ -152,9 +142,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
             return make_response(json.dumps({"reason" : "InvalidSpokeID"}),
                                  404)
 
-        spoke = Spoke.load(spoke_db,
-                           spoke_id)
-        spoke.refresh()
+        spoke = Spoke.get(spoke_id)
         spoke_dict = spoke.status()
 
         return_value = spoke_dict
