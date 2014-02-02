@@ -4,6 +4,27 @@ from uuid import uuid4
 
 from Hub.v1.Common.helpers import update_crontab
 
+from Hub.api import couch
+from sys import modules
+from Hub.v1.Spoke.Spoke_Driver import SpokeDriver
+from Hub.v1.Spoke.Spoke_RestDuino_Driver import SpokeRestDuinoDriver
+
+SPOKE_DRIVERS = [
+    "SpokeRestDuinoDriver"
+]
+
+def _driver_name_to_class(driver_name):
+    """
+    Convert spoke.driver string to driver's class
+
+    If not found, return generic SpokeDriver()
+    """
+    if driver_name in SPOKE_DRIVERS:
+        try:
+            return reduce(getattr, driver_name.split("."), modules[__name__])()
+        except AttributeError:
+            return SpokeDriver()
+    return SpokeDriver()
 
 class Spoke(Document):
     """
@@ -30,6 +51,14 @@ class Spoke(Document):
     driver = TextField()
     driver_info = DictField()
     pins = DictField()
+
+    spoke_db = couch['spokes']
+    driver_class = SpokeRestDuinoDriver()
+
+    def save(self):
+        """Save current self."""
+        return self.store(self.spoke_db)
+
 
     def status(self):
         """
@@ -77,12 +106,13 @@ class Spoke(Document):
         else:
             self.pins[pin_id]['status'] = pin.get('value')
 
-    def update_pins(self, pin_status=None):
+    def refresh(self):
         """Update object according to what we get from driver."""
-
-        if pin_status == None:
-            pin_status = {}
-        if self.active:
+        pin_status = self.driver_class.get_pins(self)
+        if not pin_status:
+            self.active = False
+        else:
+            self.active = True
             existing_pin_nums_to_ids = ({item.get('num'):item.get('id') for
                                          item in self.pins.values()})
             for pin_num, pin in pin_status.items():
@@ -98,7 +128,8 @@ class Spoke(Document):
                 else:
                     self._add_pin(pin_num,
                                   pin)
-        return True
+
+        self.store(self.spoke_db)
 
     def update_pin_schedule(self, pin, driver_shell_commands):
         """
@@ -108,6 +139,10 @@ class Spoke(Document):
         Driver_actions is a dict containing -
         {"True": <linux cmd to turn on>, "False": <linux cmd to turn off>}
         """
+        driver_shell_commands = self.driver_class.get_shell_commands(
+            self,
+            pin['num'])
+
         def action_to_command(x):
             """Convert true/false action to shell cmd."""
             x['command'] = driver_shell_commands[str(x['action'])]

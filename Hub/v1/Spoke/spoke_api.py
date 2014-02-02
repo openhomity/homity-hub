@@ -15,52 +15,15 @@ All spoke drivers should super the SpokeDriver class and implement its methods
 """
 from flask import Blueprint, request, make_response
 import json
-from sys import modules
 
 from Hub.api import couch
 from Hub.v1.Common.auth import requires_auth
 from Hub.v1.Common.helpers import int_or_string, bool_or_string
 
-from Hub.v1.Spoke.Spoke import Spoke
-from Hub.v1.Spoke.Spoke_Driver import SpokeDriver
-from Hub.v1.Spoke.Spoke_RestDuino_Driver import SpokeRestDuinoDriver
+from Hub.v1.Spoke.Spoke import Spoke, SPOKE_DRIVERS
 
 
 V1SPOKE = Blueprint('V1SPOKE', __name__)
-
-SPOKE_DRIVERS = [
-    "SpokeRestDuinoDriver"
-]
-
-def _driver_name_to_class(driver_name):
-    """
-    Convert spoke.driver string to driver's class
-
-    If not found, return generic SpokeDriver()
-    """
-    if driver_name in SPOKE_DRIVERS:
-        try:
-            return reduce(getattr, driver_name.split("."), modules[__name__])()
-        except AttributeError:
-            return SpokeDriver()
-    return SpokeDriver()
-
-def _update_spoke_pin_status(spoke):
-    """
-    Call driver's method to query pin status
-
-    Pass return dictionary to spoke object to process update
-    If spoke doesn't respond, mark active = False
-    """
-    driver = _driver_name_to_class(spoke.driver)
-    pins = driver.get_pins(spoke)
-    if pins:
-        spoke.active = True
-        spoke.update_pins(pins)
-    else:
-        spoke.active = False
-    return spoke
-
 
 def _parse_schedule_string(schedule_string):
     """
@@ -92,9 +55,10 @@ def new_spoke():
     spoke_info = request.get_json(silent=True, cache=True)
     spoke = Spoke(name=spoke_info.get('name'),
                   driver=spoke_info.get('driver'),
-                  active=False, pins={},
+                  active=False,
+                  pins={},
                   driver_info=spoke_info.get('driver_info'))
-    spoke = _update_spoke_pin_status(spoke)
+    spoke.refresh()
     spoke.store(spoke_db)
 
     return _spokes_internal(spoke_id=spoke.id)
@@ -149,7 +113,6 @@ def delete_spoke(path):
     spoke_id = parsed_path[0]
     if len(parsed_path) == 1: #delete a spoke
         if spoke_id in spoke_db:
-            spoke = Spoke()
             spoke = Spoke.load(spoke_db,
                                spoke_id)
             spoke.clear_spoke_schedule()
@@ -170,23 +133,18 @@ def _spokes_internal(spoke_id="", path=None, value=False):
     Only specific sets are allowed, enforced either here or at the driver
     InvalidInput strings are a trick to help see where we fell.
     """
-    if path == None:
-        path = []
 
     spoke_db = couch['spokes']
-    path_len = len(path)
-    spoke_list = []
-    spoke = Spoke()
 
     if not spoke_id:
         if value:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
+        spoke_list = []
         for spoke_entry in spoke_db:
             spoke = Spoke.load(spoke_db,
                                spoke_entry)
-            spoke = _update_spoke_pin_status(spoke)
-            spoke.store(spoke_db)
+            spoke.refresh()
             spoke_list.append(spoke.status())
         return json.dumps(spoke_list)
     else:
@@ -196,11 +154,14 @@ def _spokes_internal(spoke_id="", path=None, value=False):
 
         spoke = Spoke.load(spoke_db,
                            spoke_id)
-        spoke = _update_spoke_pin_status(spoke)
-        spoke.store(spoke_db)
+        spoke.refresh()
         spoke_dict = spoke.status()
 
         return_value = spoke_dict
+
+        if path == None:
+            path = []
+        path_len = len(path)
 
         #Walk the spoke's status dictionary until we get to the end of the path,
         #throw 404 if any key doesn't exist
@@ -216,33 +177,28 @@ def _spokes_internal(spoke_id="", path=None, value=False):
 
         else:
             value = bool_or_string(value)
-            driver = _driver_name_to_class(spoke.driver)
             if path_len == 3:
                 #Setting a pin's value - e.g.
                 #/spoke/<spoke_id>/pins/<pin_id>/<key> = value
                 if path[0] == "pins" and path[1] in list(spoke.pins):
                     if path[2] in ["name", "allocated"]:
                         spoke.pins[path[1]][path[2]] = value
-                        spoke.store(spoke_db)
+                        spoke.save()
                         return json.dumps(value)
                     elif path[2] == "schedule":
                         #Here we append to the list rather than replace it
                         schedule_dict = _parse_schedule_string(
                             schedule_string=value)
                         spoke.pins[path[1]][path[2]].append(schedule_dict)
-                        spoke.store(spoke_db)
-                        spoke.update_pin_schedule(spoke.pins[path[1]],
-                                                  driver.get_shell_commands(
-                                                    spoke,
-                                                    spoke.pins[path[1]]['num']))
+                        spoke.save()
+                        spoke.update_pin_schedule(spoke.pins[path[1]])
                         return json.dumps(schedule_dict)
-                    elif (driver.set_pin(spoke,
+                    elif (spoke.driver_class.set_pin(spoke,
                                          spoke.pins[path[1]]['num'],
                                          path[2],
                                          value)):
                         #Let the driver decide if it can handle it
-                        spoke = _update_spoke_pin_status(spoke)
-                        spoke.store(spoke_db)
+                        spoke.refresh()
                         spoke_dict = spoke.status()
                         return json.dumps(value)
                     else:
@@ -262,7 +218,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                     return make_response(json.dumps(
                         {"reason" : "NotImplementedPut2"}),
                         501)
-                spoke.store(spoke_db)
+                spoke.save()
                 spoke_dict = spoke.status()
                 return json.dumps(spoke_dict[path[0]][path[1]])
             elif path_len == 1:
@@ -276,7 +232,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                     return make_response(json.dumps(
                         {"reason" : "NotImplementedPut1"}),
                         501)
-                spoke.store(spoke_db)
+                spoke.save()
                 spoke_dict = spoke.status()
                 return json.dumps(spoke_dict[path[0]])
             else:
@@ -308,16 +264,11 @@ def delete_pin(path):
         for spoke_entry in spoke_db:
             spoke = Spoke.load(spoke_db,
                                spoke_entry)
-            driver = _driver_name_to_class(spoke.driver)
             if spoke.active and parsed_path[0] in list(spoke.pins):
                 try:
                     del spoke.pins[parsed_path[0]][parsed_path[1]][parsed_path[2]]
-                    spoke.store(spoke_db)
-                    spoke.update_pin_schedule(
-                        spoke.pins[parsed_path[0]],
-                        driver.get_shell_commands(
-                            spoke,
-                            spoke.pins[parsed_path[0]]['num']))
+                    spoke.save()
+                    spoke.update_pin_schedule(spoke.pins[parsed_path[0]])
                     return ""
                 except (KeyError, IndexError):
                     return make_response(
@@ -376,8 +327,7 @@ def _pins_internal(pin_id="", path=None, value=False):
         for spoke_entry in spoke_db:
             spoke = Spoke.load(spoke_db,
                                spoke_entry)
-            spoke = _update_spoke_pin_status(spoke)
-            spoke.store(spoke_db)
+            spoke.refresh()
             if spoke['active']:
                 for pin_id, pin in spoke.pins.items():
                     if pin.get('allocated'):
