@@ -105,7 +105,8 @@ def delete_spoke(path):
 
     spoke_id = parsed_path[0]
     if len(parsed_path) == 1: #delete a spoke
-        spoke = Spoke().get(spoke_id)
+        spoke = Spoke.load(spoke_db,
+                                   spoke_id)
         if spoke:
             spoke.clear_spoke_schedule()
             del spoke_db[spoke_id]
@@ -134,7 +135,8 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                                  501)
         spoke_list = []
         for spoke_entry in spoke_db:
-            spoke = Spoke().get(spoke_entry)
+            spoke = Spoke.load(spoke_db,
+                               spoke_entry)
             spoke_list.append(spoke.status())
         return json.dumps(spoke_list)
     else:
@@ -142,7 +144,8 @@ def _spokes_internal(spoke_id="", path=None, value=False):
             return make_response(json.dumps({"reason" : "InvalidSpokeID"}),
                                  404)
 
-        spoke = Spoke().get(spoke_id)
+        spoke = Spoke.load(spoke_db,
+                           spoke_id)
         spoke_dict = spoke.status()
 
         return_value = spoke_dict
