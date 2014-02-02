@@ -1,8 +1,6 @@
 """Spoke restduino driver object."""
 import json, urllib2
 
-from Hub.v1.Spoke.Spoke import Spoke
-from Hub.v1.Spoke.Spoke_Driver import SpokeDriver
 from Hub.v1.Common.helpers import bool_or_string
 
 def _parse_driver_info(spoke):
@@ -86,7 +84,7 @@ def _get_shell_commands(pin_num, driver_info):
                                 "LOW"))
     return shell_commands
 
-class SpokeRestDuinoDriver(SpokeDriver):
+class SpokeRestDuinoDriver(object):
     """Spoke restduino driver object."""
 
     def __init__(self):
