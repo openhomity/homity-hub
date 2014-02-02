@@ -1,9 +1,12 @@
-from couchdb.mapping import Document, TextField
+"""DB Class For User."""
+from couchdb.mapping import Document, TextField, DictField
 
 class User(Document):
+    """DB Class For User."""
     username = TextField()
     password = TextField()
     privilege = TextField()
-    alarmSLT = TextField()
+    driver_data = DictField()
+
 
     
