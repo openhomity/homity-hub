@@ -1,5 +1,4 @@
 """Spoke driver object."""
-from Hub.v1.Spoke.Spoke import Spoke
 
 class SpokeDriver(object):
     """Spoke driver object."""
