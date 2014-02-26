@@ -56,8 +56,8 @@ class Spoke(HomityObject):
     driver_class = SpokeRestDuinoDriver()
 
     @classmethod
-    def list(cls):
-        return cls._list()
+    def list(cls,dict_format=False):
+        return cls._list(dict_format)
 
     def delete(self):
         """Delete spoke."""
