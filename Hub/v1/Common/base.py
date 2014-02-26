@@ -5,7 +5,7 @@ from couchdb.mapping import Document
 from Hub.api import couch
 from sys import modules
 
-from Hub.v1.Common.helpers import get_couch_db
+from Hub.v1.Common.db_helpers import get_couch_db
 
 class HomityObject(Document):
     """Base class for Homity object.  Builtins for get/find/save."""
