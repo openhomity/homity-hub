@@ -1,8 +1,6 @@
 """Random helper functions."""
 from commands import getstatusoutput
 
-from Hub.api import couch
-
 def int_or_string(string):
     """Return an int if possible, else string."""
     try:
@@ -59,11 +57,4 @@ def update_crontab(object_name="", new_schedule=None):
 
     temp_crontab.close()
     getstatusoutput("crontab /tmp/crontab.txt")
-
-def get_couch_db(class_type):
-    """Return couch_db for object."""
-    if class_type == "Spoke":
-        return couch['spokes']
-    elif class_type == "Garage":
-        return couch['garages']
 
