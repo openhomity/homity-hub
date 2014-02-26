@@ -87,7 +87,7 @@ def _get_shell_commands(pin_num, driver_info):
 
 class SpokeRestDuinoDriver(SpokeDriver):
     """Spoke restduino driver object."""
-    
+
     @staticmethod
     def get_pins(spoke):
         """
@@ -101,7 +101,7 @@ class SpokeRestDuinoDriver(SpokeDriver):
         If digital=False, an analog value can be retrieved from "value"
         """
         return _get_pins(_parse_driver_info(spoke))
-    
+
     @staticmethod
     def get_pin(spoke, pin_num):
         """
@@ -115,7 +115,7 @@ class SpokeRestDuinoDriver(SpokeDriver):
         """
         return _get_pin(pin_num,
                         _parse_driver_info(spoke))
-    
+
     @staticmethod
     def set_pin(spoke, pin_num, key, value):
         """
