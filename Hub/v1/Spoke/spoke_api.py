@@ -52,7 +52,7 @@ def new_spoke():
     """
 
     spoke_info = request.get_json(silent=True, cache=True)
-    spoke = Spoke.create(spoke_info)
+    spoke = Spoke(**spoke_info)
 
     return _spokes_internal(spoke_id=spoke.id)
 
@@ -98,18 +98,15 @@ def get_spokepath(path):
 @requires_auth
 def delete_spoke(path):
     """Handle spoke-related deletion."""
-    spoke_db = couch['spokes']
     parsed_path = path.split("/")
     parsed_path = map(int_or_string,
                       parsed_path)
 
     spoke_id = parsed_path[0]
     if len(parsed_path) == 1: #delete a spoke
-        spoke = Spoke.load(spoke_db,
-                                   spoke_id)
+        spoke = Spoke.get_id(spoke_id)
         if spoke:
-            spoke.clear_spoke_schedule()
-            del spoke_db[spoke_id]
+            spoke.delete()
             return ""
 
     return make_response(json.dumps({"reason" : "InvalidPath"}),
@@ -127,26 +124,19 @@ def _spokes_internal(spoke_id="", path=None, value=False):
     InvalidInput strings are a trick to help see where we fell.
     """
 
-    spoke_db = couch['spokes']
-
     if not spoke_id:
         if value:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
-        spoke_list = []
-        for spoke_entry in spoke_db:
-            spoke = Spoke.load(spoke_db,
-                               spoke_entry)
-            spoke_list.append(spoke.status())
+        spoke_list = Spoke.list(dict_format=True)
         return json.dumps(spoke_list)
     else:
-        if spoke_id not in spoke_db:
+        spoke = Spoke.get_id(spoke_id)
+        if not spoke:
             return make_response(json.dumps({"reason" : "InvalidSpokeID"}),
                                  404)
 
-        spoke = Spoke.load(spoke_db,
-                           spoke_id)
-        spoke_dict = spoke.status()
+        spoke_dict = spoke.dict()
 
         return_value = spoke_dict
 
@@ -175,7 +165,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                     if path[2] in ["name", "allocated"]:
                         spoke.pins[path[1]][path[2]] = value
                         spoke.save()
-                        return json.dumps(value)
+                        return json.dumps(spoke.pins[path[1]][path[2]])
                     elif path[2] == "schedule":
                         #Here we append to the list rather than replace it
                         schedule_dict = _parse_schedule_string(
@@ -190,8 +180,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                                          value)):
                         #Let the driver decide if it can handle it
                         spoke.refresh()
-                        spoke_dict = spoke.status()
-                        return json.dumps(value)
+                        return json.dumps(spoke.dict())
                     else:
                         return make_response(json.dumps(
                             {"reason" : "NotImplementedPut3"}),
@@ -210,7 +199,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                         {"reason" : "NotImplementedPut2"}),
                         501)
                 spoke.save()
-                spoke_dict = spoke.status()
+                spoke_dict = spoke.dict()
                 return json.dumps(spoke_dict[path[0]][path[1]])
             elif path_len == 1:
                 #Changing a spoke top-level setting - e.g.
@@ -224,7 +213,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
                         {"reason" : "NotImplementedPut1"}),
                         501)
                 spoke.save()
-                spoke_dict = spoke.status()
+                spoke_dict = spoke.dict()
                 return json.dumps(spoke_dict[path[0]])
             else:
                 return make_response(json.dumps(
