@@ -53,6 +53,7 @@ def new_spoke():
 
     spoke_info = request.get_json(silent=True, cache=True)
     spoke = Spoke(**spoke_info)
+    spoke.refresh()
 
     return _spokes_internal(spoke_id=spoke.id)
 
