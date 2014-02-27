@@ -316,7 +316,7 @@ def _pins_internal(pin_id="", path=None, value=False):
         for spoke in spoke_list:
             spoke.refresh()
             if spoke.active and pin_id in list(spoke.pins):
-                print "Found pin_id:%s in spoke:%s" & (pin_id, spoke.id)
+                print "Found pin_id:%s in spoke:%s" % (pin_id, spoke.id)
                 return _spokes_internal(spoke_id=spoke.id,
                                         path=["pins", pin_id] + path,
                                         value=value)
