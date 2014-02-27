@@ -37,10 +37,8 @@ class HomityObject(Document):
     def _list(cls, dict_format=False):
         """Return list of objects of type."""
         class_db = get_couch_db(cls.__name__)
-        print "class_db: %s, class_name: %s" % (class_db, cls.__name__)
         object_list = []
         for class_entry in class_db:
-            print "class_entry: %s" % class_entry
             class_object = cls.get_id(class_entry)
             if class_object is not None:
                 if dict_format:
@@ -133,5 +131,6 @@ class HomityObject(Document):
         """Return object in dictionary form."""
         return_dict = dict([(k, v) for k, v in self._data.items()
                                         if k not in ('_id', '_rev')])
+        return_dict['id'] = self.id
         print return_dict
         return return_dict

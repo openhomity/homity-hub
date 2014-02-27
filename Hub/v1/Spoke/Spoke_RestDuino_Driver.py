@@ -6,7 +6,6 @@ from Hub.v1.Spoke.Spoke_Driver import SpokeDriver
 
 def _parse_driver_info(spoke):
     """Grab duino address out of driver_info."""
-    print spoke.driver_info
     spoke_driver_info = spoke.driver_info
 
     driver_info = {}
