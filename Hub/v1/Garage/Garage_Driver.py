@@ -1,5 +1,4 @@
 """Garage driver base class."""
-from Hub.v1.Garage.Garage import GarageController
 
 class GarageDriver(object):
     """Base Driver Class for Garages"""
