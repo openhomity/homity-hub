@@ -17,7 +17,7 @@ class HomityObject(Document):
         self.save()
 
     @classmethod
-    def get_id(cls, spoke_id):
+    def get_id(cls, doc_id):
         """Get a specific document from the database.
 
         :param id: the document ID
@@ -26,7 +26,7 @@ class HomityObject(Document):
         """
         class_db = get_couch_db(cls.__name__)
 
-        doc = class_db.get(spoke_id)
+        doc = class_db.get(doc_id)
         if doc is None:
             return None
         return cls.wrap(doc)
@@ -39,12 +39,12 @@ class HomityObject(Document):
         object_list = []
         for class_entry in class_db:
             print "class_entry: %s" % class_entry
-            class_object = cls.load(class_db,
-                               class_entry)
-            if dict_format:
-                object_list.append(class_object.dict())
-            else:
-                object_list.append(class_object)
+            class_object = cls.get_id(class_entry)
+            if class_object is not None:
+                if dict_format:
+                    object_list.append(class_object.dict())
+                else:
+                    object_list.append(class_object)
         return object_list
 
     @classmethod
