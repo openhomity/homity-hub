@@ -112,7 +112,7 @@ def delete_spoke(path):
     return make_response(json.dumps({"reason" : "InvalidPath"}),
                          404)
 
-def _spokes_internal(spoke_id="", path=None, value=False):
+def _spokes_internal(spoke_id=None, path=None, value=None):
     """
     Process GET/PUT requests for spoke
 
@@ -125,7 +125,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
     """
 
     if not spoke_id:
-        if value:
+        if value != None:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
         spoke_list = Spoke.list(dict_format=True)
@@ -146,7 +146,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
 
         #Walk the spoke's status dictionary until we get to the end of the path,
         #throw 404 if any key doesn't exist
-        if not value:
+        if value == None:
             for level in path:
                 try:
                     return_value = return_value[level]
@@ -282,7 +282,7 @@ def get_pinpath(path):
     else:
         return _pins_internal()
 
-def _pins_internal(pin_id="", path=None, value=False):
+def _pins_internal(pin_id=None, path=None, value=None):
     """
     Process GET/PUT requests for pin.
 
@@ -293,7 +293,7 @@ def _pins_internal(pin_id="", path=None, value=False):
 
     if not pin_id:
         #Return list of all allocated pins
-        if value:
+        if value != None:
             return make_response(json.dumps({"reason" : "InvalidInput"}),
                                  501)
         spoke_list = Spoke.list()

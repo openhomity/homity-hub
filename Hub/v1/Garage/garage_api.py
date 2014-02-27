@@ -106,7 +106,7 @@ def delete_garage_controller(path):
 
 
 def _garage_controllers_internal(
-    garage_controller_id="", path=None, value=False):
+    garage_controller_id="", path=None, value=None):
     """
     Process GET/PUT requests for garage controller.
 
@@ -119,7 +119,7 @@ def _garage_controllers_internal(
     """
 
     if not garage_controller_id:
-        if value:
+        if value != None:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
         garage_controller_list = GarageController.list(dict_format=True)
@@ -142,7 +142,7 @@ def _garage_controllers_internal(
         Walk the garage controller's status dictionary until we get to
         the end of the path, throw 404 if any key doesn't exist
         """
-        if not value:
+        if value == None:
             for level in path:
                 try:
                     return_value = return_value[level]
@@ -262,7 +262,7 @@ def get_garages_path(path):
         return _garages_internal()
 
 
-def _garages_internal(garage_id="", path=None, value=False):
+def _garages_internal(garage_id="", path=None, value=None):
     """
     Process GET/PUT requests for garage
 
@@ -274,7 +274,7 @@ def _garages_internal(garage_id="", path=None, value=False):
 
     if not garage_id:
         #Return list of all allocated garages
-        if value:
+        if value != None:
             return make_response(
                 json.dumps({"reason" : "InvalidInput"}),
                 501)
