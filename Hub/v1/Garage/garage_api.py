@@ -15,37 +15,16 @@ All garage drivers should super the GarageDriver class and implement its methods
 """
 from flask import Blueprint, request, make_response
 import json
-from sys import modules
 
 from Hub.api import couch
 from Hub.v1.Common.auth import requires_auth
 from Hub.v1.Common.helpers import int_or_string, bool_or_string
 
 from Hub.v1.Garage.Garage import GarageController
-from Hub.v1.Garage.Garage_Driver import GarageDriver
 from Hub.v1.Garage.Garage_RestDuino_Driver import GarageRestDuinoDriver
 
 
 V1GARAGE = Blueprint('V1GARAGE', __name__)
-
-GARAGE_CONTROLLER_DRIVERS = [
-    "GarageRestDuinoDriver"
-]
-
-def _driver_name_to_class(driver_name):
-    """
-    Convert garage.driver string to driver's class.
-
-    If not found, return generic GarageDriver()
-    """
-    if driver_name in GARAGE_CONTROLLER_DRIVERS:
-        try:
-            return reduce(getattr,
-                          driver_name.split("."),
-                          modules[__name__])()
-        except AttributeError:
-            return GarageDriver()
-    return GarageDriver()
 
 #Call driver's method to query garage status
 #Pass return dictionary to garage_controller object to process update

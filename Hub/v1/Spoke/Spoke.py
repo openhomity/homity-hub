@@ -53,10 +53,9 @@ class Spoke(HomityObject):
     driver_info = DictField()
     pins = DictField()
 
-    driver_class = SpokeRestDuinoDriver()
-
     def __init__(self, id=None, **values):
         HomityObject.__init__(self, id, **values)
+        self.driver_class = _driver_name_to_class(self.driver)
 
     @classmethod
     def list(cls,dict_format=False):

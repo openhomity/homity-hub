@@ -1,8 +1,31 @@
 """Garage controller object."""
 from couchdb.mapping import Document, TextField, BooleanField, DictField
 from uuid import uuid4
+from sys import modules
 
-class GarageController(Document):
+from Hub.v1.Garage.Garage_Driver import GarageDriver
+from Hub.v1.Common.base import HomityObject
+
+GARAGE_CONTROLLER_DRIVERS = [
+    "GarageRestDuinoDriver"
+]
+
+def _driver_name_to_class(driver_name):
+    """
+    Convert garage.driver string to driver's class.
+
+    If not found, return generic GarageDriver()
+    """
+    if driver_name in GARAGE_CONTROLLER_DRIVERS:
+        try:
+            return reduce(getattr,
+                          driver_name.split("."),
+                          modules[__name__])()
+        except AttributeError:
+            return GarageDriver()
+    return GarageDriver()
+
+class GarageController(HomityObject):
     """
     Garage controller object.
 
