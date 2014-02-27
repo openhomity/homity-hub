@@ -49,25 +49,19 @@ class GarageController(HomityObject):
     active = BooleanField()
     driver = TextField()
     driver_info = DictField()
-
     garages = DictField()
 
-    def status(self):
-        """Return dict of garage controller status."""
-        if self.active:
-            status_dict = {"name" : self.name,
-                           "driver" : self.driver,
-                           "driver_info" : self.driver_info,
-                           "id" : self.id,
-                           "garages" : self.garages,
-                           "active" : self.active}
-        else:
-            status_dict = {"name" : self.name,
-                           "driver" : self.driver,
-                           "driver_info" : self.driver_info,
-                           "id" : self.id,
-                           "active" : self.active}
-        return status_dict
+    def __init__(self, id=None, **values):
+        HomityObject.__init__(self, id, **values)
+        self.driver_class = _driver_name_to_class(self.driver)
+
+    @classmethod
+    def list(cls,dict_format=False):
+        return cls._list(dict_format)
+
+    def delete(self):
+        """Delete garage controller."""
+        del self.class_db[self.id]
 
     def _add_garage(self, garage_num, garage):
         """Populate fields for new garage object."""
@@ -81,12 +75,14 @@ class GarageController(HomityObject):
                                    'controller' : self.id,
                                    'location' : self.name}
 
-    def update_garages(self, garage_status=None):
+    def refresh(self):
         """Update status for garages belonging to controller."""
-        if garage_status == None:
-            garage_status = {}
-
-        if self.active:
+        self.driver_class = _driver_name_to_class(self.driver)
+        garage_status = self.driver_class.get_garages(self)
+        if not garage_status:
+            self.active = False
+        else:
+            self.active = True
             existing_garage_nums_to_ids = ({item.get('num'):item.get('id') for
                                             item in self.garages.values()})
             for garage_num, garage in garage_status.items():
@@ -95,5 +91,6 @@ class GarageController(HomityObject):
                     self.garages[garage_id]['open'] = garage.get('open')
                     self.garages[garage_id]['on'] = garage.get('on')
                 else:
-                    self._add_garage(garage_num, garage)
-        return True
+                    self._add_garage(garage_num,
+                                     garage)
+        self.save()

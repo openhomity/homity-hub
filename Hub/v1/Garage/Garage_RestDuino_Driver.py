@@ -1,8 +1,8 @@
 """Garage RESTDuino driver class."""
 import json, urllib2
 
-from Hub.v1.Garage.Garage_Driver import GarageDriver
 from Hub.v1.Common.helpers import bool_or_string
+from Hub.v1.Garage.Garage_Driver import GarageDriver
 
 def _parse_driver_info(garage):
     """Grab address field out of driver_info."""
@@ -69,17 +69,8 @@ def _send_cmd(cmd, driver_info):
 class GarageRestDuinoDriver(GarageDriver):
     """Garage RESTDuino driver class."""
 
-    def __init__(self):
-        pass
-
-    def login(self, spoke):
-        """Login as needed."""
-
-    def logout(self, spoke):
-        """Logout as needed."""
-        pass
-
-    def get_garages(self, garage_controller):
+    @staticmethod
+    def get_garages(garage_controller):
         """
         Return nested dictionary of garage status.
 
@@ -90,7 +81,8 @@ class GarageRestDuinoDriver(GarageDriver):
         """
         return _get_garages(_parse_driver_info(garage_controller))
 
-    def get_garage(self, garage_controller, garage_num):
+    @staticmethod
+    def get_garage(garage_controller, garage_num):
         """
         Returns dictionary of garage status.
 
@@ -99,7 +91,8 @@ class GarageRestDuinoDriver(GarageDriver):
         return _get_garage(garage_num,
                            _parse_driver_info(garage_controller))
 
-    def set_garage(self, garage_controller, garage_num, key, value):
+    @staticmethod
+    def set_garage(garage_controller, garage_num, key, value):
         """
         Modify garage configuration/status according to key=value
 

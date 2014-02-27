@@ -5,17 +5,17 @@ class SpokeDriver(object):
 
     def __init__(self):
         pass
-    
+
     @staticmethod
     def login(spoke):
         """Login as needed."""
         pass
-    
+
     @staticmethod
     def logout(spoke):
         """Logout as needed."""
         pass
-    
+
     @staticmethod
     def get_pins(spoke):
         """
@@ -29,7 +29,7 @@ class SpokeDriver(object):
         If digital=False, an analog value can be retrieved from "value"
         """
         return False
-    
+
     @staticmethod
     def get_pin(spoke, pin_num):
         """
@@ -42,7 +42,7 @@ class SpokeDriver(object):
         If digital=False, an analog value can be retrieved from "value"
         """
         return False
-    
+
     @staticmethod
     def set_pin(spoke, pin_num, key, value):
         """

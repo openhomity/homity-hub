@@ -16,7 +16,6 @@ All spoke drivers should super the SpokeDriver class and implement its methods
 from flask import Blueprint, request, make_response
 import json
 
-from Hub.api import couch
 from Hub.v1.Common.auth import requires_auth
 from Hub.v1.Common.helpers import int_or_string, bool_or_string
 
@@ -234,17 +233,15 @@ def get_pins():
 @requires_auth
 def delete_pin(path):
     """Handle pin-related deletion."""
-    spoke_db = couch['spokes']
     parsed_path = path.split("/")
     parsed_path = map(int_or_string,
                       parsed_path)
 
     if len(parsed_path) == 3 and parsed_path[1] == "schedule":
         #delete a schedule entry
-        spoke = Spoke()
-        for spoke_entry in spoke_db:
-            spoke = Spoke.load(spoke_db,
-                               spoke_entry)
+        spoke_list = Spoke.list()
+        for spoke in spoke_list:
+            spoke.refresh()
             if spoke.active and parsed_path[0] in list(spoke.pins):
                 try:
                     del spoke.pins[parsed_path[0]][parsed_path[1]][parsed_path[2]]
@@ -293,21 +290,15 @@ def _pins_internal(pin_id="", path=None, value=False):
     Only retrieves pins marked 'allocated' unless specific pin_id is given
     If pin_id, request processed same as /spoke/<spoke_id>/pins/<pin_id>
     """
-    spoke_db = couch['spokes']
 
-    if path == None:
-        path = []
-
-    pin_list = []
-    spoke = Spoke()
     if not pin_id:
         #Return list of all allocated pins
         if value:
             return make_response(json.dumps({"reason" : "InvalidInput"}),
                                  501)
-        for spoke_entry in spoke_db:
-            spoke = Spoke.load(spoke_db,
-                               spoke_entry)
+        spoke_list = Spoke.list()
+        pin_list = []
+        for spoke in spoke_list:
             spoke.refresh()
             if spoke['active']:
                 for pin_id, pin in spoke.pins.items():
@@ -317,11 +308,15 @@ def _pins_internal(pin_id="", path=None, value=False):
     else:
         #Grab only the object requested
         #Find the spoke that has this pin and pass it off to the spoke handler
-        for spoke_entry in spoke_db:
-            spoke = Spoke.load(spoke_db,
-                               spoke_entry)
+
+        if path == None:
+            path = []
+
+        spoke_list = Spoke.list()
+        for spoke in spoke_list:
+            spoke.refresh()
             if spoke.active and pin_id in list(spoke.pins):
-                return _spokes_internal(spoke_id=spoke_entry,
+                return _spokes_internal(spoke_id=spoke.id,
                                         path=["pins", pin_id] + path,
                                         value=value)
 
