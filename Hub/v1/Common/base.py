@@ -12,7 +12,7 @@ class HomityObject(Document):
     def __init__(self, id=None, **values):
         Document.__init__(self, id, **values)
         self.class_db = get_couch_db(type(self).__name__)
-        print self.dict()
+        print self
         self.refresh()
         self.save()
 
@@ -38,10 +38,10 @@ class HomityObject(Document):
         print "class_db: %s, class_name: %s" % (class_db, cls.__name__)
         object_list = []
         for class_entry in class_db:
+            print "class_entry: %s" % class_entry
             class_object = cls.load(class_db,
                                class_entry)
             if dict_format:
-                print class_object.dict()
                 object_list.append(class_object.dict())
             else:
                 object_list.append(class_object)
