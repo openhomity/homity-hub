@@ -87,6 +87,7 @@ class Spoke(HomityObject):
 
     def refresh(self):
         """Update object according to what we get from driver."""
+        self.driver_class = _driver_name_to_class(self.driver)
         pin_status = self.driver_class.get_pins(self)
         if not pin_status:
             self.active = False
