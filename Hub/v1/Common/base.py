@@ -28,7 +28,6 @@ class HomityObject(Document):
             return None
 
         doc_obj = cls.wrap(doc)
-        doc_obj.refresh()
 
         return doc_obj
 
