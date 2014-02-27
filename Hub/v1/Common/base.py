@@ -12,10 +12,6 @@ class HomityObject(Document):
     def __init__(self, id=None, **values):
         Document.__init__(self, id, **values)
         self.class_db = get_couch_db(type(self).__name__)
-        print self
-        if self.id is not None:
-            self.refresh()
-            self.save()
 
     @classmethod
     def get_id(cls, doc_id):
@@ -30,7 +26,12 @@ class HomityObject(Document):
         doc = class_db.get(doc_id)
         if doc is None:
             return None
-        return cls.wrap(doc)
+
+        doc_obj = cls.wrap(doc)
+        doc_obj.refresh()
+        doc_obj.save()
+
+        return doc_obj
 
     @classmethod
     def _list(cls, dict_format=False):
@@ -130,5 +131,7 @@ class HomityObject(Document):
 
     def dict(self):
         """Return object in dictionary form."""
-        return dict([(k, v) for k, v in self._data.items()
+        return_dict = dict([(k, v) for k, v in self._data.items()
                                         if k not in ('_id', '_rev')])
+        print return_dict
+        return return_dict

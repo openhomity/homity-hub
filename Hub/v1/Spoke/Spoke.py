@@ -57,7 +57,6 @@ class Spoke(HomityObject):
 
     def __init__(self, id=None, **values):
         HomityObject.__init__(self, id, **values)
-        print self.dict()
 
     @classmethod
     def list(cls,dict_format=False):
