@@ -65,7 +65,7 @@ class Spoke(HomityObject):
     def delete(self):
         """Delete spoke."""
         self.clear_spoke_schedule()
-        del self.class_db[self._id]
+        del self.class_db[self.id]
 
     def _add_pin(self, pin_num, pin):
         """Add new pin to object."""
@@ -78,7 +78,7 @@ class Spoke(HomityObject):
             'schedule' : [],
             'digital' : pin.get('digital'),
             'output' : pin.get('output'),
-            'spoke' : self._id,
+            'spoke' : self.id,
             'location' : self.name
             }
         if pin.get('digital'):
@@ -129,8 +129,8 @@ class Spoke(HomityObject):
         map(action_to_command,
             pin['schedule'])
         if pin['digital'] and pin['output']:
-            update_crontab("%s %s" % (pin['id'], self._id), pin['schedule'])
+            update_crontab("%s %s" % (pin['id'], self.id), pin['schedule'])
 
     def clear_spoke_schedule(self):
         """Clear all pin schedule entries."""
-        update_crontab(self._id)
+        update_crontab(self.id)

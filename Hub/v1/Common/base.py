@@ -29,7 +29,6 @@ class HomityObject(Document):
 
         doc_obj = cls.wrap(doc)
         doc_obj.refresh()
-        doc_obj.save()
 
         return doc_obj
 
@@ -132,5 +131,4 @@ class HomityObject(Document):
         return_dict = dict([(k, v) for k, v in self._data.items()
                                         if k not in ('_id', '_rev')])
         return_dict['id'] = self.id
-        print return_dict
         return return_dict
