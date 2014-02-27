@@ -1,10 +1,13 @@
 """Garage controller object."""
-from couchdb.mapping import Document, TextField, BooleanField, DictField
+from couchdb.mapping import TextField, BooleanField, DictField
 from uuid import uuid4
+
+from Hub.api import couch
 from sys import modules
 
-from Hub.v1.Garage.Garage_Driver import GarageDriver
 from Hub.v1.Common.base import HomityObject
+from Hub.v1.Garage.Garage_Driver import GarageDriver
+from Hub.v1.Garage.Garage_RestDuino_Driver import GarageRestDuinoDriver
 
 GARAGE_CONTROLLER_DRIVERS = [
     "GarageRestDuinoDriver"

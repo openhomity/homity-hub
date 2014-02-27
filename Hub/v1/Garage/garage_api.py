@@ -20,8 +20,7 @@ from Hub.api import couch
 from Hub.v1.Common.auth import requires_auth
 from Hub.v1.Common.helpers import int_or_string, bool_or_string
 
-from Hub.v1.Garage.Garage import GarageController
-from Hub.v1.Garage.Garage_RestDuino_Driver import GarageRestDuinoDriver
+from Hub.v1.Garage.Garage import GarageController, GARAGE_CONTROLLER_DRIVERS
 
 
 V1GARAGE = Blueprint('V1GARAGE', __name__)
