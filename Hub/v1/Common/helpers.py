@@ -10,9 +10,9 @@ def int_or_string(string):
 
 def bool_or_string(string):
     """Return bool if possible, else string."""
-    if string == True or string(string).strip().lower() in ('t', 'true', 'yes', '1'):
+    if string == True or str(string).strip().lower() in ('t', 'true', 'yes', '1'):
         return True
-    elif string == False or string(string).strip().lower() in ('f', 'false', 'no', '0'):
+    elif string == False or str(string).strip().lower() in ('f', 'false', 'no', '0'):
         return False
     else:
         return str(string)
