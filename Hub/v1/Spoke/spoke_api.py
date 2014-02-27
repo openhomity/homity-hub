@@ -268,9 +268,9 @@ def get_pinpath(path):
         try:
             value = request.args['value']
         except KeyError:
-            value = False
+            value = None
     else:
-        value = False
+        value = None
 
     if len(path) > 1:
         return _pins_internal(pin_id=path[0],

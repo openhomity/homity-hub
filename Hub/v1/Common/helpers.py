@@ -10,12 +10,13 @@ def int_or_string(string):
 
 def bool_or_string(string):
     """Return bool if possible, else string."""
-    if string == True or str(string).strip().lower() in ('t', 'true', 'yes', '1'):
+    string_str = str(string)
+    if string == True or string_str.strip().lower() in ('t', 'true', 'yes', '1'):
         return True
-    elif string == False or str(string).strip().lower() in ('f', 'false', 'no', '0'):
+    elif string == False or string_str.strip().lower() in ('f', 'false', 'no', '0'):
         return False
     else:
-        return str(string)
+        return string_str
 
 def update_crontab(object_name="", new_schedule=None):
     """
