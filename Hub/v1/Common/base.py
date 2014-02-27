@@ -13,8 +13,9 @@ class HomityObject(Document):
         Document.__init__(self, id, **values)
         self.class_db = get_couch_db(type(self).__name__)
         print self
-        self.refresh()
-        self.save()
+        if self.id is not None:
+            self.refresh()
+            self.save()
 
     @classmethod
     def get_id(cls, doc_id):
