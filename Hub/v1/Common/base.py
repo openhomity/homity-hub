@@ -34,11 +34,13 @@ class HomityObject(Document):
     def _list(cls, dict_format=False):
         """Return list of objects of type."""
         class_db = get_couch_db(cls.__name__)
+        print "class_db: %s, class_name: %s" % (class_db, cls.__name__)
         object_list = []
         for class_entry in class_db:
             class_object = cls.load(class_db,
                                class_entry)
             if dict_format:
+                print class_object.dict()
                 object_list.append(class_object.dict())
             else:
                 object_list.append(class_object)
