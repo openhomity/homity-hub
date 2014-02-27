@@ -12,6 +12,7 @@ class HomityObject(Document):
     def __init__(self, id=None, **values):
         Document.__init__(self, id, **values)
         self.class_db = get_couch_db(type(self).__name__)
+        print self.dict()
         self.refresh()
         self.save()
 
@@ -130,7 +131,3 @@ class HomityObject(Document):
         """Return object in dictionary form."""
         return dict([(k, v) for k, v in self._data.items()
                                         if k not in ('_id', '_rev')])
-
-
-
-
