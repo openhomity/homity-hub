@@ -101,6 +101,7 @@ class Spoke(HomityObject):
                     self.pins[pin_id]['digital'] = pin.get('digital')
                     self.pins[pin_id]['output'] = pin.get('output')
                     self.pins[pin_id]['location'] = self.name
+                    self.pins[pin_id]['spoke'] = self.id
                     if pin.get('digital'):
                         self.pins[pin_id]['status'] = pin.get('on')
                     else:
