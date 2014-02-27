@@ -135,7 +135,7 @@ def _spokes_internal(spoke_id="", path=None, value=False):
         if not spoke:
             return make_response(json.dumps({"reason" : "InvalidSpokeID"}),
                                  404)
-        spoke.refresh()
+
         spoke_dict = spoke.dict()
 
         return_value = spoke_dict
@@ -313,11 +313,9 @@ def _pins_internal(pin_id="", path=None, value=False):
             path = []
 
         spoke_list = Spoke.list()
-        print "Spoke list len: %s" % len(spoke_list)
         for spoke in spoke_list:
             spoke.refresh()
             if spoke.active and pin_id in list(spoke.pins):
-                print "Found pin_id:%s in spoke:%s" % (pin_id, spoke.id)
                 return _spokes_internal(spoke_id=spoke.id,
                                         path=["pins", pin_id] + path,
                                         value=value)

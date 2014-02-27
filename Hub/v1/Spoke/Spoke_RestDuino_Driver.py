@@ -124,6 +124,7 @@ class SpokeRestDuinoDriver(SpokeDriver):
         Return True if option is allowed and successful
         Return False if option is not allowed or unsuccessful
         """
+        print "Set pin called with %s %s %s %s" % (spoke.id, pin_num, key, value)
         return _set_pin(pin_num,
                         key,
                         value,
