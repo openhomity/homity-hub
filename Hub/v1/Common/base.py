@@ -128,7 +128,6 @@ class HomityObject(Document):
             obj.refresh()
             if hasattr(obj, subobject):
                 for subobj in getattr(obj, subobject).values():
-                    print "Subobj: %s" % (subobj)
                     try:
                         if all(subobj[attr] == value
                                 for (attr, value) in searches):
