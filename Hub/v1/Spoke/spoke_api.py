@@ -80,9 +80,9 @@ def get_spokepath(path):
         try:
             value = request.args['value']
         except KeyError:
-            value = False
+            value = None
     else:
-        value = False
+        value = None
 
     if len(path) > 1:
         return _spokes_internal(spoke_id=path[0],

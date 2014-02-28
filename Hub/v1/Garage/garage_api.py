@@ -71,9 +71,9 @@ def get_garage_controller_path(path):
         try:
             value = request.args['value']
         except KeyError:
-            value = False
+            value = None
     else:
-        value = False
+        value = None
 
     if len(path) > 1:
         return _garage_controllers_internal(garage_controller_id=path[0],
