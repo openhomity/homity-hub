@@ -90,6 +90,8 @@ class GarageController(HomityObject):
                     garage_id = existing_garage_nums_to_ids.get(garage_num)
                     self.garages[garage_id]['open'] = garage.get('open')
                     self.garages[garage_id]['on'] = garage.get('on')
+                    self.garages[garage_id]['location'] = self.name
+                    self.garages[garage_id]['controller'] = self.id
                 else:
                     self._add_garage(garage_num,
                                      garage)
