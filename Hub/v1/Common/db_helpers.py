@@ -8,4 +8,6 @@ def get_couch_db(class_type):
         return couch['spokes']
     elif class_type == "GarageController":
         return couch['garages']
+    elif class_type == "CameraController":
+        return couch['cameras']
 
