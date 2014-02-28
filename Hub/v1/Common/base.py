@@ -128,11 +128,11 @@ class HomityObject(Document):
             obj.refresh()
             if hasattr(obj, subobject):
                 for subobj in getattr(obj, subobject):
-                    print "Subobj %s" % subobj
+                    print "Subobj: %s, obj.subobject[subobj]: %s" % (subobj, obj.subobject[subobj])
                     try:
-                        if all(subobj[attr] == value
+                        if all(obj.subobject[subobj][attr] == value
                                 for (attr, value) in searches):
-                            found.append(subobj)
+                            found.append(obj.subobject[subobj])
                     except AttributeError:
                         continue
 
