@@ -71,6 +71,7 @@ class HomityObject(Document):
         listing = cls._list()
         searches = kwargs.items()
         for obj in listing:
+            obj.refresh()
             try:
                 if all(getattr(obj, attr) == value
                         for (attr, value) in searches):
@@ -105,12 +106,34 @@ class HomityObject(Document):
         listing = cls._list()
         searches = kwargs.items()
         for obj in listing:
+            obj.refresh()
             try:
-                if all(value in list(obj.attr)
+                if all(value in list(getattr(obj, attr))
                         for (attr, value) in searches):
                     found.append(obj)
             except AttributeError:
                 continue
+
+        return found
+
+    @classmethod
+    def _find_all_subobjects(cls, subobject, **kwargs):
+        """Return all subobjects of class where key=value in object.subobject"""
+        #untested
+        found = []
+
+        listing = cls._list()
+        searches = kwargs.items()
+        for obj in listing:
+            obj.refresh()
+            if hasattr(obj, subobject):
+                for subobj in getattr(obj, subobject).values():
+                    try:
+                        if all(subobj[attr] == value
+                                for (attr, value) in searches):
+                            found.append(subobj)
+                    except AttributeError:
+                        continue
 
         return found
 

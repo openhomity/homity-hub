@@ -278,14 +278,8 @@ def _garages_internal(garage_id="", path=None, value=None):
             return make_response(
                 json.dumps({"reason" : "InvalidInput"}),
                 501)
-        garage_controller_list = GarageController.list()
-        garage_list = []
-        for garage_controller in garage_controller_list:
-            garage_controller.refresh()
-            if garage_controller['active']:
-                for garage_id, garage in garage_controller.garages.items():
-                    if garage.get('allocated'):
-                        garage_list.append(garage)
+
+        garage_list = GarageController.list_available_garages()
         return json.dumps(garage_list)
     else:
         """
@@ -295,15 +289,12 @@ def _garages_internal(garage_id="", path=None, value=None):
         """
         if path == None:
             path = []
-        garage_controller_list = GarageController.list()
-        for garage_controller in garage_controller_list:
-            garage_controller.refresh()
-            if (garage_controller.active and
-                garage_id in list(garage_controller.garages)):
-                return _garage_controllers_internal(
-                    garage_controller_id=garage_controller.id,
-                    path=["garages", garage_id] + path,
-                    value=value)
+
+        garage_controller = GarageController.get_for_garage_id(garage_id)
+        return _garage_controllers_internal(
+                            garage_controller_id=garage_controller.id,
+                            path=["garages", garage_id] + path,
+                            value=value)
 
     return make_response(
         json.dumps({"reason" : "GarageNotFound"}),

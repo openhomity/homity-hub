@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from Hub.api import couch
 
-from flask import request, make_response
+from flask import request, Response
 from Hub import app
 
 def get_session():
@@ -58,38 +58,27 @@ def _check_credentials(username, userpassword):
             dbpasswordhash, salt = user_db[user_id]['password'].split(':')
             userpasswordhash = sha256(salt.encode() +
                                       userpassword.encode()).hexdigest()
-            dbprivilege = user_db[user_id]['privilege']
+            continue
 
     if userpasswordhash == dbpasswordhash:
-        return True, dbprivilege
+        return True
 
-    return False, "", ""
+    return False
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 def requires_auth(f):
-    """ Wrapper function to parse session ID, pass to _check_session."""
+    """ Wrapper for HTTP basic auth."""
     @wraps(f)
     def decorated(*args, **kwargs):
-        """ Wrapper function to parse session ID, pass to _check_session."""
-        if request.headers['content-type'] == "application/json":
-            params = request.get_json(silent=True, cache=True)
-        else:
-            params = request.args
-
-        if 'session' in list(params):
-            if not _check_session(params['session']):
-                return make_response(
-                    json.dumps({"reason" : "BadOrInactiveSession"}),
-                    401)
-
-        elif 'username' in list(params) and 'password' in list(params):
-            if not _check_credentials(params['username'],
-                                      params['password'])[0]:
-                return make_response(json.dumps({"reason" : "BadUserOrPass"}),
-                                     401)
-
-        else:
-            return make_response(json.dumps({"reason" : "NoAuthProvided"}),
-                                 401)
-
+        """ Wrapper for HTTP basic auth."""
+        auth = request.authorization
+        if not auth or not _check_credentials(auth.username, auth.password):
+            return authenticate()
         return f(*args, **kwargs)
     return decorated

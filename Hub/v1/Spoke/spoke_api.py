@@ -296,14 +296,7 @@ def _pins_internal(pin_id=None, path=None, value=None):
         if value != None:
             return make_response(json.dumps({"reason" : "InvalidInput"}),
                                  501)
-        spoke_list = Spoke.list()
-        pin_list = []
-        for spoke in spoke_list:
-            spoke.refresh()
-            if spoke['active']:
-                for pin_id, pin in spoke.pins.items():
-                    if pin.get('allocated'):
-                        pin_list.append(pin)
+        pin_list = Spoke.list_available_pins()
         return json.dumps(pin_list)
     else:
         #Grab only the object requested
@@ -312,13 +305,10 @@ def _pins_internal(pin_id=None, path=None, value=None):
         if path == None:
             path = []
 
-        spoke_list = Spoke.list()
-        for spoke in spoke_list:
-            spoke.refresh()
-            if spoke.active and pin_id in list(spoke.pins):
-                return _spokes_internal(spoke_id=spoke.id,
-                                        path=["pins", pin_id] + path,
-                                        value=value)
+        spoke = Spoke.get_for_pin_id(pin_id)
+        return _spokes_internal(spoke_id=spoke.id,
+                                path=["pins", pin_id] + path,
+                                value=value)
 
     return make_response(json.dumps({"reason" : "PinNotFound"}),
                          404)
