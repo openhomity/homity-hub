@@ -78,7 +78,7 @@ def requires_auth(f):
     def decorated(*args, **kwargs):
         """ Wrapper for HTTP basic auth."""
         auth = request.authorization
-        if not auth or not _check_credentials(auth.username, auth.password)[0]:
+        if not auth or not _check_credentials(auth.username, auth.password):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
