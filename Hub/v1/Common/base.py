@@ -127,12 +127,13 @@ class HomityObject(Document):
         for obj in listing:
             obj.refresh()
             if hasattr(obj, subobject):
-                try:
-                    if all(obj.subobject[attr] == value
-                            for (attr, value) in searches):
-                        found.append(obj.subobject)
-                except AttributeError:
-                    continue
+                for subobj in obj.subobject:
+                    try:
+                        if all(subobj[attr] == value
+                                for (attr, value) in searches):
+                            found.append(subobj)
+                    except AttributeError:
+                        continue
 
         return found
 
