@@ -61,6 +61,19 @@ class Spoke(HomityObject):
     def list(cls,dict_format=False):
         return cls._list(dict_format)
 
+    @classmethod
+    def list_available_pins(cls):
+        return cls._find_all_subobjects('pins', available=True)
+
+    @classmethod
+    def get_for_pin_id(cls, pin_id):
+        """Get the spoke containing pin_id."""
+        found, spoke = cls._find_in_list(pins=pin_id)
+        if found:
+            return spoke
+        else:
+            return None
+
     def delete(self):
         """Delete spoke."""
         self.clear_spoke_schedule()

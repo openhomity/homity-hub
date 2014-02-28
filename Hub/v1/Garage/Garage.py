@@ -59,6 +59,19 @@ class GarageController(HomityObject):
     def list(cls,dict_format=False):
         return cls._list(dict_format)
 
+    @classmethod
+    def get_for_garage_id(cls, garage_id):
+        """Get the GarageController containing garage_id."""
+        found, garage_controller = cls._find_in_list(garages=garage_id)
+        if found:
+            return garage_controller
+        else:
+            return None
+
+    @classmethod
+    def list_available_garages(cls):
+        return cls._find_all_subobjects('garages', available=True)
+
     def delete(self):
         """Delete garage controller."""
         del self.class_db[self.id]
