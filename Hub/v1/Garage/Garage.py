@@ -70,7 +70,7 @@ class GarageController(HomityObject):
 
     @classmethod
     def list_available_garages(cls):
-        return cls._find_all_subobjects('garages', available=True)
+        return cls._find_all_subobjects('garages', allocated=True)
 
     def delete(self):
         """Delete garage controller."""
