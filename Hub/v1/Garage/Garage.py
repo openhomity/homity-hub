@@ -31,7 +31,11 @@ def _driver_name_to_class(driver_name):
 class GarageController(HomityObject):
     """
     Garage controller object.
-
+    "name" : <name of garage controller>
+    "active" : <true|false if controller is online>
+    "driver" : <name of driver>
+    "driver_info" : <dict containing driver-specific info>
+    "garages" :
         {
             "garage_id" : {
                 "id" : <uuid of garage>

@@ -10,7 +10,7 @@ Allows for POST command to create new garage controller objects,
 as PUT to modify and GET to view
 
 Garage v1 implements a driver architecture, importing pluggable
-drivers from the Server/v1/Garage directory
+drivers from the Hub/v1/Garage directory
 All garage drivers should super the GarageDriver class and implement its methods
 """
 from flask import Blueprint, request, make_response
