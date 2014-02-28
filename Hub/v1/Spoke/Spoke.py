@@ -63,7 +63,7 @@ class Spoke(HomityObject):
 
     @classmethod
     def list_available_pins(cls):
-        return cls._find_all_subobjects('pins', available=True)
+        return cls._find_all_subobjects('pins', allocated=True)
 
     @classmethod
     def get_for_pin_id(cls, pin_id):
