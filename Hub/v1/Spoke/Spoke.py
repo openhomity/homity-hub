@@ -1,11 +1,33 @@
 """Spoke controller object."""
-from couchdb.mapping import Document, TextField, BooleanField, DictField
+from couchdb.mapping import TextField, BooleanField, DictField
 from uuid import uuid4
 
 from Hub.v1.Common.helpers import update_crontab
+from Hub.v1.Common.base import HomityObject
 
+from Hub.api import couch
+from sys import modules
+from Hub.v1.Spoke.Spoke_Driver import SpokeDriver
+from Hub.v1.Spoke.Spoke_RestDuino_Driver import SpokeRestDuinoDriver
 
-class Spoke(Document):
+SPOKE_DRIVERS = [
+    "SpokeRestDuinoDriver"
+]
+
+def _driver_name_to_class(driver_name):
+    """
+    Convert spoke.driver string to driver's class
+
+    If not found, return generic SpokeDriver()
+    """
+    if driver_name in SPOKE_DRIVERS:
+        try:
+            return reduce(getattr, driver_name.split("."), modules[__name__])()
+        except AttributeError:
+            return SpokeDriver()
+    return SpokeDriver()
+
+class Spoke(HomityObject):
     """
     Spoke controller object.
         {
@@ -31,32 +53,18 @@ class Spoke(Document):
     driver_info = DictField()
     pins = DictField()
 
-    def status(self):
-        """
-        Return status of spoke.
+    def __init__(self, id=None, **values):
+        HomityObject.__init__(self, id, **values)
+        self.driver_class = _driver_name_to_class(self.driver)
 
-        Todo - investigate replacing with __repr__
-        """
-        #self.refresh_status()
-        driver_ext = {}
-        #driver_ext = driver.get_ext_info()
-        if self.active:
-            status_dict = {"name" : self.name,
-                           "driver" : self.driver,
-                           "driver_info" : self.driver_info,
-                           "id" : self.id,
-                           "pins" : self.pins,
-                           "active" : self.active,
-                           "driver_ext" : driver_ext}
-        else:
-            status_dict = {"name" : self.name,
-                           "driver" : self.driver,
-                           "driver_info" : self.driver_info,
-                           "id" : self.id,
-                           "pins" : {},
-                            "active" : self.active,
-                            "driver_ext" : driver_ext}
-        return status_dict
+    @classmethod
+    def list(cls,dict_format=False):
+        return cls._list(dict_format)
+
+    def delete(self):
+        """Delete spoke."""
+        self.clear_spoke_schedule()
+        del self.class_db[self.id]
 
     def _add_pin(self, pin_num, pin):
         """Add new pin to object."""
@@ -77,12 +85,14 @@ class Spoke(Document):
         else:
             self.pins[pin_id]['status'] = pin.get('value')
 
-    def update_pins(self, pin_status=None):
+    def refresh(self):
         """Update object according to what we get from driver."""
-
-        if pin_status == None:
-            pin_status = {}
-        if self.active:
+        self.driver_class = _driver_name_to_class(self.driver)
+        pin_status = self.driver_class.get_pins(self)
+        if not pin_status:
+            self.active = False
+        else:
+            self.active = True
             existing_pin_nums_to_ids = ({item.get('num'):item.get('id') for
                                          item in self.pins.values()})
             for pin_num, pin in pin_status.items():
@@ -91,6 +101,7 @@ class Spoke(Document):
                     self.pins[pin_id]['digital'] = pin.get('digital')
                     self.pins[pin_id]['output'] = pin.get('output')
                     self.pins[pin_id]['location'] = self.name
+                    self.pins[pin_id]['spoke'] = self.id
                     if pin.get('digital'):
                         self.pins[pin_id]['status'] = pin.get('on')
                     else:
@@ -98,9 +109,9 @@ class Spoke(Document):
                 else:
                     self._add_pin(pin_num,
                                   pin)
-        return True
+        self.save()
 
-    def update_pin_schedule(self, pin, driver_shell_commands):
+    def update_pin_schedule(self, pin):
         """
         Update cron for pin schedule.
 
@@ -108,6 +119,10 @@ class Spoke(Document):
         Driver_actions is a dict containing -
         {"True": <linux cmd to turn on>, "False": <linux cmd to turn off>}
         """
+        driver_shell_commands = self.driver_class.get_shell_commands(
+            self,
+            pin['num'])
+
         def action_to_command(x):
             """Convert true/false action to shell cmd."""
             x['command'] = driver_shell_commands[str(x['action'])]

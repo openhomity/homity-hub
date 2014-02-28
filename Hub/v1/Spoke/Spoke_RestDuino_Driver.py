@@ -1,9 +1,8 @@
 """Spoke restduino driver object."""
 import json, urllib2
 
-from Hub.v1.Spoke.Spoke import Spoke
-from Hub.v1.Spoke.Spoke_Driver import SpokeDriver
 from Hub.v1.Common.helpers import bool_or_string
+from Hub.v1.Spoke.Spoke_Driver import SpokeDriver
 
 def _parse_driver_info(spoke):
     """Grab duino address out of driver_info."""
@@ -89,18 +88,8 @@ def _get_shell_commands(pin_num, driver_info):
 class SpokeRestDuinoDriver(SpokeDriver):
     """Spoke restduino driver object."""
 
-    def __init__(self):
-        pass
-
-    def login(self, spoke):
-        """Login as needed."""
-        pass
-
-    def logout(self, spoke):
-        """Logout as needed."""
-        pass
-
-    def get_pins(self, spoke):
+    @staticmethod
+    def get_pins(spoke):
         """
         Returns nested dictionary of all pins' status.
 
@@ -113,7 +102,8 @@ class SpokeRestDuinoDriver(SpokeDriver):
         """
         return _get_pins(_parse_driver_info(spoke))
 
-    def get_pin(self, spoke, pin_num):
+    @staticmethod
+    def get_pin(spoke, pin_num):
         """
         Returns dictionary of requested pin's status.
 
@@ -126,7 +116,8 @@ class SpokeRestDuinoDriver(SpokeDriver):
         return _get_pin(pin_num,
                         _parse_driver_info(spoke))
 
-    def set_pin(self, spoke, pin_num, key, value):
+    @staticmethod
+    def set_pin(spoke, pin_num, key, value):
         """
         Modify pin configuration/status according to key=value.
 
@@ -138,7 +129,8 @@ class SpokeRestDuinoDriver(SpokeDriver):
                         value,
                         _parse_driver_info(spoke))
 
-    def get_shell_commands(self, spoke, pin_num):
+    @staticmethod
+    def get_shell_commands(spoke, pin_num):
         """
         Return shell commands for turning pins on/off.
 

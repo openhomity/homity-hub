@@ -1,5 +1,4 @@
 """Spoke driver object."""
-from Hub.v1.Spoke.Spoke import Spoke
 
 class SpokeDriver(object):
     """Spoke driver object."""
@@ -7,15 +6,18 @@ class SpokeDriver(object):
     def __init__(self):
         pass
 
-    def login(self, spoke):
+    @staticmethod
+    def login(spoke):
         """Login as needed."""
         pass
 
-    def logout(self, spoke):
+    @staticmethod
+    def logout(spoke):
         """Logout as needed."""
         pass
 
-    def get_pins(self, spoke):
+    @staticmethod
+    def get_pins(spoke):
         """
         Returns nested dictionary of all pins' status.
 
@@ -28,7 +30,8 @@ class SpokeDriver(object):
         """
         return False
 
-    def get_pin(self, spoke, pin_num):
+    @staticmethod
+    def get_pin(spoke, pin_num):
         """
         Returns dictionary of requested pin's status.
 
@@ -40,7 +43,8 @@ class SpokeDriver(object):
         """
         return False
 
-    def set_pin(self, spoke, pin_num, key, value):
+    @staticmethod
+    def set_pin(spoke, pin_num, key, value):
         """
         Modify pin configuration/status according to key=value.
 
@@ -49,7 +53,8 @@ class SpokeDriver(object):
         """
         return False
 
-    def get_shell_commands(self, spoke, pin_num):
+    @staticmethod
+    def get_shell_commands(spoke, pin_num):
         """
         Return shell commands for turning pins on/off.
 

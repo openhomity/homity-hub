@@ -1,5 +1,4 @@
 """Garage driver base class."""
-from Hub.v1.Garage.Garage import GarageController
 
 class GarageDriver(object):
     """Base Driver Class for Garages"""
@@ -7,15 +6,18 @@ class GarageDriver(object):
     def __init__(self):
         pass
 
-    def login(self, spoke):
+    @staticmethod
+    def login(spoke):
         """Login as needed."""
         pass
 
-    def logout(self, spoke):
+    @staticmethod
+    def logout(spoke):
         """Logout as needed."""
         pass
 
-    def get_garages(self, garage_controller):
+    @staticmethod
+    def get_garages(garage_controller):
         """
         Return nested dictionary of garage status.
 
@@ -26,7 +28,8 @@ class GarageDriver(object):
         """
         return False
 
-    def get_garage(self, garage_controller, garage_num):
+    @staticmethod
+    def get_garage(garage_controller, garage_num):
         """
         Returns dictionary of garage status.
 
@@ -34,7 +37,8 @@ class GarageDriver(object):
         """
         return False
 
-    def set_garage(self, garage_controller, garage_num, key, value):
+    @staticmethod
+    def set_garage(garage_controller, garage_num, key, value):
         """
         Modify garage configuration/status according to key=value
 
