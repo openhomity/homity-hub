@@ -66,7 +66,7 @@ class CameraController(HomityObject):
     @classmethod
     def get_for_camera_id(cls, camera_id):
         """Get the camera controller containing camera_id."""
-        found, camera_controller = cls._find_in_list(camera=camera_id)
+        found, camera_controller = cls._find_in_list(cameras=camera_id)
         if found:
             return camera_controller
         else:
