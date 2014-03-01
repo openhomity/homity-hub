@@ -6,6 +6,7 @@ from Hub.api import couch
 from sys import modules
 
 from Hub.v1.Common.db_helpers import get_couch_db
+from Hub.v1.Common.helpers import bool_or_string
 
 class HomityObject(Document):
     """Base class for Homity object.  Builtins for get/find/save."""
@@ -74,7 +75,7 @@ class HomityObject(Document):
         for obj in listing:
             obj.refresh()
             try:
-                if all(getattr(obj, attr) == value
+                if all(getattr(obj, attr) == bool_or_string(value)
                         for (attr, value) in searches):
                     if dict_format:
                         found.append(obj.dict())
@@ -135,7 +136,7 @@ class HomityObject(Document):
             if hasattr(obj, subobject):
                 for subobj in getattr(obj, subobject).values():
                     try:
-                        if all(subobj[attr] == value
+                        if all(subobj[attr] == bool_or_string(value)
                                 for (attr, value) in searches):
                             found.append(subobj)
                     except (AttributeError, KeyError):
