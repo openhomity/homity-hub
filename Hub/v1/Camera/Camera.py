@@ -11,7 +11,7 @@ from Hub.v1.Camera.Camera_Driver import CameraDriver
 from Hub.v1.Camera.Camera_BlueIris_Driver import CameraBlueIrisDriver
 
 CAMERA_DRIVERS = [
-    "SpokeRestDuinoDriver"
+    "CameraBlueIrisDriver"
 ]
 
 def _driver_name_to_class(driver_name):
