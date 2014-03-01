@@ -39,9 +39,12 @@ def _login(camera_controller):
                                json.dumps(data))
     if result['result'] == "success":
         camera_controller.driver_info['session'] = session_id
+        camera_controller.active = True
         camera_controller.save()
         return True
     else:
+        camera_controller.active = False
+        camera_controller.save()
         return False
 
 def _send_command (camera_controller, cmd):
@@ -49,17 +52,16 @@ def _send_command (camera_controller, cmd):
     driver_info = _parse_driver_info(camera_controller)
 
     if driver_info.get('session'):
-        try:
-            cmd['session'] = driver_info.get('session')
-            return _send_raw_command(driver_info,
-                                     json.dumps(cmd))
-        except:
-            pass
-    else:
-        _login(camera_controller)
         cmd['session'] = driver_info.get('session')
-        return _send_raw_command(driver_info,
-                                 json.dumps(cmd))
+        ret_info = _send_raw_command(driver_info,
+                                     json.dumps(cmd))
+        if ret_info.get('result') == 'success':
+            return ret_info
+
+    _login(camera_controller)
+    cmd['session'] = driver_info.get('session')
+    return _send_raw_command(driver_info,
+                             json.dumps(cmd))
 
 def _send_raw_command (driver_info, cmd):
     """Send raw BlueIris command."""
