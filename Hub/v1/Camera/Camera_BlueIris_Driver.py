@@ -106,7 +106,7 @@ def _set_camera(camera_controller, camera_name, key, value):
     if key == 'on':
         data['enable'] = value
         result = _send_command(camera_controller, data)
-        return result['result'] == "success"
+        return result != None
     elif key == 'alerts':
         return _enable_indoor_alerts(camera_controller, key)
     else:
