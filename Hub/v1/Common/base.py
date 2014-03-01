@@ -6,6 +6,7 @@ from Hub.api import couch
 from sys import modules
 
 from Hub.v1.Common.db_helpers import get_couch_db
+from Hub.v1.Common.helpers import bool_or_string
 
 class HomityObject(Document):
     """Base class for Homity object.  Builtins for get/find/save."""
@@ -47,9 +48,8 @@ class HomityObject(Document):
         return object_list
 
     @classmethod
-    def _find(cls, **kwargs):
+    def _find(cls, dict_format=False, **kwargs):
         """Return object of class type that matches kwargs filters."""
-        #untested
         matches = cls._find_all(dict_format, **kwargs)
         num_matches = len(matches)
         if num_matches == 0:
@@ -63,9 +63,8 @@ class HomityObject(Document):
             return True, matches[0]
 
     @classmethod
-    def _find_all(cls, **kwargs):
+    def _find_all(cls, dict_format=False, **kwargs):
         """Return all objects of class type that match kwargs filters."""
-        #untested
         found = []
 
         listing = cls._list()
@@ -73,18 +72,19 @@ class HomityObject(Document):
         for obj in listing:
             obj.refresh()
             try:
-                if all(getattr(obj, attr) == value
+                if all(getattr(obj, attr) == bool_or_string(value)
                         for (attr, value) in searches):
-                    found.append(obj)
-            except AttributeError:
+                    if dict_format:
+                        found.append(obj.dict())
+                    else:
+                        found.append(obj)
+            except (AttributeError, KeyError):
                 continue
-
         return found
 
     @classmethod
     def _find_in_list(cls, **kwargs):
         """Return object of class type where value is in list(key)."""
-        #untested
         matches = cls._find_all_in_list(**kwargs)
         num_matches = len(matches)
         if num_matches == 0:
@@ -100,7 +100,6 @@ class HomityObject(Document):
     @classmethod
     def _find_all_in_list(cls, **kwargs):
         """Return all objects of class type where value is in list(key)."""
-        #untested
         found = []
 
         listing = cls._list()
@@ -111,7 +110,7 @@ class HomityObject(Document):
                 if all(value in list(getattr(obj, attr))
                         for (attr, value) in searches):
                     found.append(obj)
-            except AttributeError:
+            except (AttributeError, KeyError):
                 continue
 
         return found
@@ -119,7 +118,6 @@ class HomityObject(Document):
     @classmethod
     def _find_all_subobjects(cls, subobject, **kwargs):
         """Return all subobjects of class where key=value in object.subobject"""
-        #untested
         found = []
 
         listing = cls._list()
@@ -129,12 +127,11 @@ class HomityObject(Document):
             if hasattr(obj, subobject):
                 for subobj in getattr(obj, subobject).values():
                     try:
-                        if all(subobj[attr] == value
+                        if all(subobj[attr] == bool_or_string(value)
                                 for (attr, value) in searches):
                             found.append(subobj)
-                    except AttributeError:
+                    except (AttributeError, KeyError):
                         continue
-
         return found
 
     def save(self):

@@ -31,7 +31,11 @@ def _driver_name_to_class(driver_name):
 class GarageController(HomityObject):
     """
     Garage controller object.
-
+    "name" : <name of garage controller>
+    "active" : <true|false if controller is online>
+    "driver" : <name of driver>
+    "driver_info" : <dict containing driver-specific info>
+    "garages" :
         {
             "garage_id" : {
                 "id" : <uuid of garage>
@@ -56,8 +60,8 @@ class GarageController(HomityObject):
         self.driver_class = _driver_name_to_class(self.driver)
 
     @classmethod
-    def list(cls,dict_format=False):
-        return cls._list(dict_format)
+    def list(cls,dict_format=False, **kwargs):
+        return cls._find_all(dict_format, **kwargs)
 
     @classmethod
     def get_for_garage_id(cls, garage_id):
@@ -69,8 +73,10 @@ class GarageController(HomityObject):
             return None
 
     @classmethod
-    def list_available_garages(cls):
-        return cls._find_all_subobjects('garages', available=True)
+    def list_available_garages(cls, **kwargs):
+        if 'allocated' not in kwargs:
+            kwargs['allocated'] = True
+        return cls._find_all_subobjects('garages', **kwargs)
 
     def delete(self):
         """Delete garage controller."""

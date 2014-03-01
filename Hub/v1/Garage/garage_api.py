@@ -10,14 +10,14 @@ Allows for POST command to create new garage controller objects,
 as PUT to modify and GET to view
 
 Garage v1 implements a driver architecture, importing pluggable
-drivers from the Server/v1/Garage directory
+drivers from the Hub/v1/Garage directory
 All garage drivers should super the GarageDriver class and implement its methods
 """
 from flask import Blueprint, request, make_response
 import json
 
 from Hub.v1.Common.auth import requires_auth
-from Hub.v1.Common.helpers import int_or_string, bool_or_string
+from Hub.v1.Common.helpers import int_or_string, bool_or_string, parse_request_value
 
 from Hub.v1.Garage.Garage import GarageController, GARAGE_CONTROLLER_DRIVERS
 
@@ -55,7 +55,7 @@ def get_garage_controllers():
     """
     Get all garage controllers.
     """
-    return _garage_controllers_internal()
+    return _garage_controllers_internal(**request.args.to_dict(flat=True))
 
 @V1GARAGE.route('/v1/garagecontroller/<path:path>', methods=['GET', 'PUT'])
 @requires_auth
@@ -67,13 +67,7 @@ def get_garage_controller_path(path):
     path = map(int_or_string,
                parsed_path)
 
-    if request.method == 'PUT':
-        try:
-            value = request.args['value']
-        except KeyError:
-            value = None
-    else:
-        value = None
+    value = parse_request_value(request)
 
     if len(path) > 1:
         return _garage_controllers_internal(garage_controller_id=path[0],
@@ -106,7 +100,7 @@ def delete_garage_controller(path):
 
 
 def _garage_controllers_internal(
-    garage_controller_id="", path=None, value=None):
+    garage_controller_id="", path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for garage controller.
 
@@ -122,7 +116,8 @@ def _garage_controllers_internal(
         if value != None:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
-        garage_controller_list = GarageController.list(dict_format=True)
+        garage_controller_list = GarageController.list(dict_format=True,
+                                                       **kwargs)
         return json.dumps(garage_controller_list)
     else:
         garage_controller = GarageController.get_id(garage_controller_id)
@@ -230,7 +225,7 @@ def get_garages():
     """
     Get all 'allocated' garages.
     """
-    return _garages_internal()
+    return _garages_internal(**request.args.to_dict(flat=True))
 
 
 @V1GARAGE.route('/v1/garage/<path:path>', methods=['GET', 'PUT'])
@@ -243,13 +238,7 @@ def get_garages_path(path):
     path = map(int_or_string,
                parsed_path)
 
-    if request.method == 'PUT':
-        try:
-            value = request.args['value']
-        except KeyError:
-            value = None
-    else:
-        value = None
+    value = parse_request_value(request)
 
     if len(path) > 1:
         return _garages_internal(garage_id=path[0],
@@ -262,7 +251,7 @@ def get_garages_path(path):
         return _garages_internal()
 
 
-def _garages_internal(garage_id="", path=None, value=None):
+def _garages_internal(garage_id="", path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for garage
 
@@ -279,7 +268,7 @@ def _garages_internal(garage_id="", path=None, value=None):
                 json.dumps({"reason" : "InvalidInput"}),
                 501)
 
-        garage_list = GarageController.list_available_garages()
+        garage_list = GarageController.list_available_garages(**kwargs)
         return json.dumps(garage_list)
     else:
         """
