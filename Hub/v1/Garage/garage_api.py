@@ -17,7 +17,7 @@ from flask import Blueprint, request, make_response
 import json
 
 from Hub.v1.Common.auth import requires_auth
-from Hub.v1.Common.helpers import int_or_string, bool_or_string
+from Hub.v1.Common.helpers import int_or_string, bool_or_string, parse_request_value
 
 from Hub.v1.Garage.Garage import GarageController, GARAGE_CONTROLLER_DRIVERS
 
@@ -67,13 +67,7 @@ def get_garage_controller_path(path):
     path = map(int_or_string,
                parsed_path)
 
-    if request.method == 'PUT':
-        try:
-            value = request.args['value']
-        except KeyError:
-            value = None
-    else:
-        value = None
+    value = parse_request_value(request)
 
     if len(path) > 1:
         return _garage_controllers_internal(garage_controller_id=path[0],
@@ -244,13 +238,7 @@ def get_garages_path(path):
     path = map(int_or_string,
                parsed_path)
 
-    if request.method == 'PUT':
-        try:
-            value = request.args['value']
-        except KeyError:
-            value = None
-    else:
-        value = None
+    value = parse_request_value(request)
 
     if len(path) > 1:
         return _garages_internal(garage_id=path[0],

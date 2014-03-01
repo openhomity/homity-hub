@@ -17,7 +17,7 @@ from flask import Blueprint, request, make_response
 import json
 
 from Hub.v1.Common.auth import requires_auth
-from Hub.v1.Common.helpers import int_or_string, bool_or_string
+from Hub.v1.Common.helpers import int_or_string, bool_or_string, parse_request_value
 
 from Hub.v1.Spoke.Spoke import Spoke, SPOKE_DRIVERS
 
@@ -76,13 +76,7 @@ def get_spokepath(path):
     path = map(int_or_string,
                parsed_path)
 
-    if request.method == 'PUT':
-        try:
-            value = request.args['value']
-        except KeyError:
-            value = None
-    else:
-        value = None
+    value = parse_request_value(request)
 
     if len(path) > 1:
         return _spokes_internal(spoke_id=path[0],
@@ -264,13 +258,7 @@ def get_pinpath(path):
     path = map(int_or_string,
                parsed_path)
 
-    if request.method == 'PUT':
-        try:
-            value = request.args['value']
-        except KeyError:
-            value = None
-    else:
-        value = None
+    value = parse_request_value(request)
 
     if len(path) > 1:
         return _pins_internal(pin_id=path[0],

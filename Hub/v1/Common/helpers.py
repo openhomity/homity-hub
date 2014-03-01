@@ -59,3 +59,21 @@ def update_crontab(object_name="", new_schedule=None):
     temp_crontab.close()
     getstatusoutput("crontab /tmp/crontab.txt")
 
+def parse_request_value(request):
+    """Grab JSON or formencoded value from request."""
+    if request.method == 'PUT':
+        if request.headers['content-type'] == "application/json":
+            try:
+                value = request.get_json(silent=True, cache=True)['value']
+            except KeyError:
+                value = None
+        else:
+            try:
+                value = request.args['value']
+            except KeyError:
+                value = None
+    else:
+        value = None
+    return value
+
+
