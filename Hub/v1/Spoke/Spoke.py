@@ -58,12 +58,14 @@ class Spoke(HomityObject):
         self.driver_class = _driver_name_to_class(self.driver)
 
     @classmethod
-    def list(cls,dict_format=False):
-        return cls._list(dict_format)
+    def list(cls,dict_format=False, **kwargs):
+        return cls._find_all(dict_format, **kwargs)
 
     @classmethod
-    def list_available_pins(cls):
-        return cls._find_all_subobjects('pins', allocated=True)
+    def list_available_pins(cls, **kwargs):
+        if 'allocated' not in kwargs:
+            kwargs['allocated'] = True
+        return cls._find_all_subobjects('pins', **kwargs)
 
     @classmethod
     def get_for_pin_id(cls, pin_id):

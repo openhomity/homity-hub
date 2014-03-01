@@ -66,7 +66,7 @@ def get_spoke_drivers():
 @requires_auth
 def get_spokes():
     """Get all spokes."""
-    return _spokes_internal()
+    return _spokes_internal(**request.args.to_dict(flat=True))
 
 @V1SPOKE.route('/v1/spoke/<path:path>', methods=['GET', 'PUT'])
 @requires_auth
@@ -112,7 +112,7 @@ def delete_spoke(path):
     return make_response(json.dumps({"reason" : "InvalidPath"}),
                          404)
 
-def _spokes_internal(spoke_id=None, path=None, value=None):
+def _spokes_internal(spoke_id=None, path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for spoke
 
@@ -128,7 +128,7 @@ def _spokes_internal(spoke_id=None, path=None, value=None):
         if value != None:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
-        spoke_list = Spoke.list(dict_format=True)
+        spoke_list = Spoke.list(dict_format=True, **kwargs)
         return json.dumps(spoke_list)
     else:
         spoke = Spoke.get_id(spoke_id)
@@ -227,7 +227,7 @@ def _spokes_internal(spoke_id=None, path=None, value=None):
 @requires_auth
 def get_pins():
     """Get all 'allocated' pins."""
-    return _pins_internal()
+    return _pins_internal(**request.args.to_dict(flat=True))
 
 @V1SPOKE.route('/v1/pin/<path:path>', methods=['DELETE'])
 @requires_auth
@@ -282,7 +282,7 @@ def get_pinpath(path):
     else:
         return _pins_internal()
 
-def _pins_internal(pin_id=None, path=None, value=None):
+def _pins_internal(pin_id=None, path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for pin.
 
@@ -296,7 +296,7 @@ def _pins_internal(pin_id=None, path=None, value=None):
         if value != None:
             return make_response(json.dumps({"reason" : "InvalidInput"}),
                                  501)
-        pin_list = Spoke.list_available_pins()
+        pin_list = Spoke.list_available_pins(**kwargs)
         return json.dumps(pin_list)
     else:
         #Grab only the object requested

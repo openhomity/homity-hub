@@ -50,7 +50,6 @@ class HomityObject(Document):
     @classmethod
     def _find(cls, dict_format=False, **kwargs):
         """Return object of class type that matches kwargs filters."""
-        #untested
         matches = cls._find_all(dict_format, **kwargs)
         num_matches = len(matches)
         if num_matches == 0:
@@ -66,7 +65,6 @@ class HomityObject(Document):
     @classmethod
     def _find_all(cls, dict_format=False, **kwargs):
         """Return all objects of class type that match kwargs filters."""
-        #untested
         found = []
 
         listing = cls._list()
@@ -87,7 +85,6 @@ class HomityObject(Document):
     @classmethod
     def _find_in_list(cls, **kwargs):
         """Return object of class type where value is in list(key)."""
-        #untested
         matches = cls._find_all_in_list(**kwargs)
         num_matches = len(matches)
         if num_matches == 0:
@@ -103,7 +100,6 @@ class HomityObject(Document):
     @classmethod
     def _find_all_in_list(cls, **kwargs):
         """Return all objects of class type where value is in list(key)."""
-        #untested
         found = []
 
         listing = cls._list()
@@ -123,7 +119,6 @@ class HomityObject(Document):
     @classmethod
     def _find_all_subobjects(cls, subobject, **kwargs):
         """Return all subobjects of class where key=value in object.subobject"""
-        #untested
         found = []
 
         listing = cls._list()
@@ -138,7 +133,6 @@ class HomityObject(Document):
                             found.append(subobj)
                     except (AttributeError, KeyError):
                         continue
-        print "Found: %s" % found
         return found
 
     def save(self):

@@ -55,7 +55,7 @@ def get_garage_controllers():
     """
     Get all garage controllers.
     """
-    return _garage_controllers_internal()
+    return _garage_controllers_internal(**request.args.to_dict(flat=True))
 
 @V1GARAGE.route('/v1/garagecontroller/<path:path>', methods=['GET', 'PUT'])
 @requires_auth
@@ -106,7 +106,7 @@ def delete_garage_controller(path):
 
 
 def _garage_controllers_internal(
-    garage_controller_id="", path=None, value=None):
+    garage_controller_id="", path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for garage controller.
 
@@ -122,7 +122,8 @@ def _garage_controllers_internal(
         if value != None:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
-        garage_controller_list = GarageController.list(dict_format=True)
+        garage_controller_list = GarageController.list(dict_format=True,
+                                                       **kwargs)
         return json.dumps(garage_controller_list)
     else:
         garage_controller = GarageController.get_id(garage_controller_id)
@@ -230,7 +231,7 @@ def get_garages():
     """
     Get all 'allocated' garages.
     """
-    return _garages_internal()
+    return _garages_internal(**request.args.to_dict(flat=True))
 
 
 @V1GARAGE.route('/v1/garage/<path:path>', methods=['GET', 'PUT'])
@@ -262,7 +263,7 @@ def get_garages_path(path):
         return _garages_internal()
 
 
-def _garages_internal(garage_id="", path=None, value=None):
+def _garages_internal(garage_id="", path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for garage
 
@@ -279,7 +280,7 @@ def _garages_internal(garage_id="", path=None, value=None):
                 json.dumps({"reason" : "InvalidInput"}),
                 501)
 
-        garage_list = GarageController.list_available_garages()
+        garage_list = GarageController.list_available_garages(**kwargs)
         return json.dumps(garage_list)
     else:
         """

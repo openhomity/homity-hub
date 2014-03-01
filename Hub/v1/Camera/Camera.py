@@ -61,7 +61,8 @@ class CameraController(HomityObject):
 
     @classmethod
     def list_available_cameras(cls, **kwargs):
-        kwargs['allocated'] = True
+        if 'allocated' not in kwargs:
+            kwargs['allocated'] = True
         return cls._find_all_subobjects('cameras', **kwargs)
 
     @classmethod
