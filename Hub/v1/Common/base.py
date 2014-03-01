@@ -104,7 +104,6 @@ class HomityObject(Document):
 
         listing = cls._list()
         searches = kwargs.items()
-        print "Listing: %s, Searches: %s" % (listing, searches)
         for obj in listing:
             obj.refresh()
             try:
