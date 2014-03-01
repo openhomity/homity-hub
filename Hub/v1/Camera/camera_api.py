@@ -12,7 +12,7 @@ as well as PUT to modify and GET to view
 
 Camera v1 implements a driver architecture,
 importing pluggable drivers from the Hub/v1/Camera directory
-All spoke drivers should super the CameraDriver class and implement its methods
+All drivers should super the CameraDriver class and implement its methods
 """
 from flask import Blueprint, request, make_response
 import json
@@ -29,7 +29,7 @@ V1CAMERA = Blueprint('V1CAMERA', __name__)
 @requires_auth
 def new_camera_controller():
     """
-    Create new spoke from input dictionary -
+    Create new camera controller from input dictionary -
 
     {'name': <string>, 'driver': <string>, 'driver_info': <dict>}
     """
@@ -43,16 +43,16 @@ def new_camera_controller():
 
 @V1CAMERA.route('/v1/cameradrivers', methods=['GET'])
 @requires_auth
-def get_spoke_drivers():
+def get_camera_drivers():
     """Return list of camera drivers."""
     return json.dumps(CAMERA_DRIVERS)
 
 @V1CAMERA.route('/v1/cameracontroller', methods=['GET'])
 @requires_auth
-def get_spokes():
+def get_camera_controllers():
     """Get all camera controllers."""
-    print "Args: %s" % request.args
-    return _camera_controllers_internal(**request.args)
+    print "Args: %s, dict:%s" % (request.args, request.args.to_dict(flat=True))
+    return _camera_controllers_internal(**request.args.to_dict(flat=True))
 
 @V1CAMERA.route('/v1/cameracontroller/<path:path>', methods=['GET', 'PUT'])
 @requires_auth
@@ -120,7 +120,7 @@ def _camera_controllers_internal(camera_controller_id=None, path=None, value=Non
     else:
         camera_controller = CameraController.get_id(camera_controller_id)
         if not camera_controller:
-            return make_response(json.dumps({"reason" : "InvalidSpokeID"}),
+            return make_response(json.dumps({"reason" : "InvalidControllerID"}),
                                  404)
 
         camera_controller_dict = camera_controller.dict()
@@ -131,7 +131,7 @@ def _camera_controllers_internal(camera_controller_id=None, path=None, value=Non
             path = []
         path_len = len(path)
 
-        #Walk the spoke's status dictionary until we get to the end of the path,
+        #Walk the controller's status dictionary until we get to the end of the path,
         #throw 404 if any key doesn't exist
         if value == None:
             for level in path:
@@ -184,7 +184,7 @@ def _camera_controllers_internal(camera_controller_id=None, path=None, value=Non
                 camera_controller_dict = camera_controller.dict()
                 return json.dumps(camera_controller_dict[path[0]][path[1]])
             elif path_len == 1:
-                #Changing a spoke top-level setting - e.g.
+                #Changing a controller top-level setting - e.g.
                 #/cameracontroller/<id>/<key> = value
                 if path[0] in ["name", "driver"]:
                     setattr(camera_controller, path[0], value)
@@ -207,7 +207,7 @@ def _camera_controllers_internal(camera_controller_id=None, path=None, value=Non
 @requires_auth
 def get_cameras():
     """Get all 'allocated' cameras."""
-    return _cameras_internal(**request.args)
+    return _cameras_internal(**request.args.to_dict(flat=True))
 
 @V1CAMERA.route('/v1/camera/<path:path>', methods=['GET', 'PUT'])
 @requires_auth
@@ -253,7 +253,7 @@ def _cameras_internal(camera_id=None, path=None, value=None, **kwargs):
         return json.dumps(camera_list)
     else:
         #Grab only the object requested
-        #Find the spoke that has this pin and pass it off to the spoke handler
+        #Find the controller that has this camera and pass it off to the handler
 
         if path == None:
             path = []
