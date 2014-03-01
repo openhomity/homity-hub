@@ -63,7 +63,7 @@ class HomityObject(Document):
             return True, matches[0]
 
     @classmethod
-    def _find_all(cls, **kwargs):
+    def _find_all(cls, dict_format=False, **kwargs):
         """Return all objects of class type that match kwargs filters."""
         #untested
         found = []
@@ -75,7 +75,10 @@ class HomityObject(Document):
             try:
                 if all(getattr(obj, attr) == value
                         for (attr, value) in searches):
-                    found.append(obj)
+                    if dict_format:
+                        found.append(obj.dict())
+                    else:
+                        found.append(obj)
             except AttributeError:
                 continue
 

@@ -56,12 +56,13 @@ class CameraController(HomityObject):
         self.driver_class = _driver_name_to_class(self.driver)
 
     @classmethod
-    def list(cls,dict_format=False):
-        return cls._list(dict_format)
+    def list(cls,dict_format=False, **kwargs):
+        return cls._find_all(dict_format, **kwargs)
 
     @classmethod
-    def list_available_cameras(cls):
-        return cls._find_all_subobjects('cameras', allocated=True)
+    def list_available_cameras(cls, **kwargs):
+        kwargs['allocated'] = True
+        return cls._find_all_subobjects('cameras', **kwargs)
 
     @classmethod
     def get_for_camera_id(cls, camera_id):

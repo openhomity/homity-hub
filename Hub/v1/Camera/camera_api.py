@@ -51,7 +51,7 @@ def get_spoke_drivers():
 @requires_auth
 def get_spokes():
     """Get all camera controllers."""
-    return _camera_controllers_internal()
+    return _camera_controllers_internal(**request.args)
 
 @V1CAMERA.route('/v1/cameracontroller/<path:path>', methods=['GET', 'PUT'])
 @requires_auth
@@ -97,7 +97,7 @@ def delete_camera_controller(path):
     return make_response(json.dumps({"reason" : "InvalidPath"}),
                          404)
 
-def _camera_controllers_internal(camera_controller_id=None, path=None, value=None):
+def _camera_controllers_internal(camera_controller_id=None, path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for camera controller
 
@@ -113,7 +113,8 @@ def _camera_controllers_internal(camera_controller_id=None, path=None, value=Non
         if value != None:
             return make_response(json.dumps({"reason" : "NotImplemented"}),
                                  501)
-        camera_controller_list = CameraController.list(dict_format=True)
+        camera_controller_list = CameraController.list(dict_format=True,
+                                                       **kwargs)
         return json.dumps(camera_controller_list)
     else:
         camera_controller = CameraController.get_id(camera_controller_id)
@@ -205,7 +206,7 @@ def _camera_controllers_internal(camera_controller_id=None, path=None, value=Non
 @requires_auth
 def get_cameras():
     """Get all 'allocated' cameras."""
-    return _cameras_internal()
+    return _cameras_internal(**request.args)
 
 @V1CAMERA.route('/v1/camera/<path:path>', methods=['GET', 'PUT'])
 @requires_auth
@@ -233,7 +234,7 @@ def get_camera_path(path):
     else:
         return _cameras_internal()
 
-def _cameras_internal(camera_id=None, path=None, value=None):
+def _cameras_internal(camera_id=None, path=None, value=None, **kwargs):
     """
     Process GET/PUT requests for camera.
 
@@ -247,7 +248,7 @@ def _cameras_internal(camera_id=None, path=None, value=None):
         if value != None:
             return make_response(json.dumps({"reason" : "InvalidInput"}),
                                  501)
-        camera_list = CameraController.list_available_cameras()
+        camera_list = CameraController.list_available_cameras(**kwargs)
         return json.dumps(camera_list)
     else:
         #Grab only the object requested
