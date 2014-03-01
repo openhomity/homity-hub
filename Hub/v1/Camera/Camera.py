@@ -95,11 +95,13 @@ class CameraController(HomityObject):
         """Update object according to what we get from driver."""
         self.driver_class = _driver_name_to_class(self.driver)
         camera_status = self.driver_class.get_cameras(self)
+        print "camera_status: %s" % camera_status
         if not camera_status:
             pass
         else:
             existing_camera_names_to_ids = ({item.get('name'):item.get('id') for
                                          item in self.cameras.values()})
+            print "existing: %s" % existing_camera_names_to_ids
             for camera in camera_status:
                 if camera.get('name') in list(existing_camera_names_to_ids):
                     camera_id = existing_camera_names_to_ids.get(
