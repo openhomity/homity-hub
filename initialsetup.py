@@ -1,13 +1,9 @@
 """Initial setup for homityhub."""
-import couchdb, uuid, argparse, hashlib
+import couchdb, argparse
 from commands import getstatusoutput
-from couchdb.mapping import Document, TextField
+from os.path import exists
 
-class User(Document):
-    """ Userclass. """
-    username = TextField()
-    password = TextField()
-    privilege = TextField()
+from Hub.v1.Common.User import User
 
 def main():
     """ Main."""
@@ -36,7 +32,8 @@ def main():
     if args.couch:
         couch.resource.credentials = (couchdb_admin_user, couchdb_admin_pass)
 
-    for db_name in ['users', 'sessions', 'spokes', 'garages', 'alarms', 'cameras', 'locks']:
+    for db_name in ['users', 'sessions', 'spokes',
+                    'garages', 'alarms', 'cameras', 'locks']:
         print 'Creating "%s" database' % db_name
         try:
             couch.create(db_name)
@@ -47,40 +44,39 @@ def main():
         except couchdb.PreconditionFailed:
             print '    "%s" db already exists, moving on' % db_name
 
-    print "Creating new user %s" % new_hub_username
-    user_db = couch['users']
-    new_user = User()
-    new_user.username = new_hub_username
-    password = new_hub_password
-    new_user.privilege = 'user'
-    salt = uuid.uuid4().hex
-    new_user.password = (hashlib.sha256(salt.encode() +
-                                        password.encode()).hexdigest() +
-                                        ':' +
-                                        salt)
-
-    new_user.store(user_db)
-    print ("Successfully created %s - %s:%s" %
-           (new_user.id, new_user.username, new_user.password))
+    hub_user = User.get_user(new_hub_username)
+    if hub_user != None:
+        print "Updating user %s's password" % new_hub_username
+        hub_user.change_password(new_hub_password)
+        hub_user.save()
+        print ("Successfully updated %s - %s:%s" %
+           (hub_user.id, hub_user.username, hub_user.password))
+    else:
+        print "Creating new user %s" % new_hub_username
+        hub_user = User(new_hub_username, new_hub_password)
+        hub_user.save()
+        print ("Successfully created %s - %s:%s" %
+           (hub_user.id, hub_user.username, hub_user.password))
 
     '''
     Set up config & log files
     '''
-    print "Copying default.conf to /etc/homity/homityhub.conf"
-    try:
-        getstatusoutput("cp default.conf /etc/homity/homityhub.conf")
-    except:
-        raise Exception('Configuration file creation failed - \
-                        make sure /etc/homity directory is \
-                        created and owned by current user')
-
-    print "Creating log file at /var/log/homity/Hub.log"
-    try:
-        getstatusoutput("touch /var/log/homity/Hub.log")
-    except:
-        raise Exception('Log file creation failed - \
-                        make sure /var/log/homity directory \
-                        is created and owned by current user')
+    if not exists('/etc/homity/homityhub.conf'):
+        print "Copying default.conf to /etc/homity/homityhub.conf"
+        try:
+            getstatusoutput("cp default.conf /etc/homity/homityhub.conf")
+        except:
+            raise Exception('Configuration file creation failed - \
+                            make sure /etc/homity directory is \
+                            created and owned by current user')
+        print "Creating log file at /var/log/homity/Hub.log"
+    if not exists('/var/log/homity/Hub.log'):
+        try:
+            getstatusoutput("touch /var/log/homity/Hub.log")
+        except:
+            raise Exception('Log file creation failed - \
+                            make sure /var/log/homity directory \
+                            is created and owned by current user')
 
 if __name__ == '__main__':
     main()

@@ -10,4 +10,6 @@ def get_couch_db(class_type):
         return couch['garages']
     elif class_type == "CameraController":
         return couch['cameras']
+    elif class_type == "User":
+        return couch['users']
 
