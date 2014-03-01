@@ -51,6 +51,7 @@ def get_spoke_drivers():
 @requires_auth
 def get_spokes():
     """Get all camera controllers."""
+    print "Args: %s" % request.args
     return _camera_controllers_internal(**request.args)
 
 @V1CAMERA.route('/v1/cameracontroller/<path:path>', methods=['GET', 'PUT'])
