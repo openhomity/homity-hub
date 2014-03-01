@@ -51,7 +51,6 @@ def get_camera_drivers():
 @requires_auth
 def get_camera_controllers():
     """Get all camera controllers."""
-    print "Args: %s, dict:%s" % (request.args, request.args.to_dict(flat=True))
     return _camera_controllers_internal(**request.args.to_dict(flat=True))
 
 @V1CAMERA.route('/v1/cameracontroller/<path:path>', methods=['GET', 'PUT'])
