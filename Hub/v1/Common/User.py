@@ -20,6 +20,7 @@ class User(HomityObject):
 
     @classmethod
     def get_user(cls,username):
+        """Fetch user object by username."""
         found, user = cls._find(username=username)
         if found:
             return user
@@ -27,11 +28,19 @@ class User(HomityObject):
             return None
 
     def change_password(self,password):
+        """Change user's PW to password."""
         salt = uuid4().hex
         self.password = (sha256(salt.encode() +
                         password.encode()).hexdigest() +
                         ':' +
                         salt)
+
+    def check_password(self,password):
+        """Check if user password is == to password."""
+        dbpasswordhash, salt = self.password.split(':')
+        userpasswordhash = sha256(salt.encode() +
+                                  password.encode()).hexdigest()
+        return userpasswordhash == dbpasswordhash
 
 
 
