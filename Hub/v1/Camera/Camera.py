@@ -83,7 +83,7 @@ class CameraController(HomityObject):
             'allocated' : False,
             'id' : camera_id,
             'name' : camera.get('name'),
-            'description' : camera.get('description')
+            'description' : camera.get('description'),
             'on' : camera.get('on'),
             'recording' : camera.get('recording'),
             'alerts' : camera.get('alerts'),
