@@ -70,6 +70,7 @@ class HomityObject(Document):
 
         listing = cls._list()
         searches = kwargs.items()
+        print "Listing: %s, Searches: %s" % (listing, searches)
         for obj in listing:
             obj.refresh()
             try:
@@ -82,6 +83,7 @@ class HomityObject(Document):
             except (AttributeError, KeyError):
                 continue
 
+        print "Found: %s" % found
         return found
 
     @classmethod
@@ -108,6 +110,7 @@ class HomityObject(Document):
 
         listing = cls._list()
         searches = kwargs.items()
+        print "Listing: %s, Searches: %s" % (listing, searches)
         for obj in listing:
             obj.refresh()
             try:
@@ -137,7 +140,7 @@ class HomityObject(Document):
                             found.append(subobj)
                     except (AttributeError, KeyError):
                         continue
-
+        print "Found: %s" % found
         return found
 
     def save(self):
