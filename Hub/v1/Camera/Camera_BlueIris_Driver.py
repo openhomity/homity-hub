@@ -92,7 +92,8 @@ def _get_cameras(camera_controller):
                 "recording" : camera['isRecording'],
                 "description" : camera['optionDisplay']
             })
-
+    
+    print "camera list: %s" % camera_list
     return camera_list
 
 def _get_camera(camera_controller, camera_name):
