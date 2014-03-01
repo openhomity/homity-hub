@@ -88,7 +88,7 @@ def _get_cameras(camera_controller):
             camera_list.append({
                 "name" : camera['optionValue'],
                 "on" : camera['isEnabled'],
-                "alerts" : camera['isMotion'],
+                "alerts" : camera['isAlerting'],
                 "recording" : camera['isRecording'],
                 "description" : camera['optionDisplay']
             })
