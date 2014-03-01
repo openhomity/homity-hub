@@ -154,10 +154,10 @@ def _camera_controllers_internal(camera_controller_id=None, path=None, value=Non
                         return json.dumps(
                             camera_controller.cameras[path[1]][path[2]])
                     elif (camera_controller.driver_class.set_camera(
-                        camera_controller,
-                        camera_controller[path[1]]['num'],
-                                         path[2],
-                                         value)):
+                                    camera_controller,
+                                    camera_controller[path[1]]['name'],
+                                    path[2],
+                                    value)):
                         #Let the driver decide if it can handle it
                         camera_controller.refresh()
                         return json.dumps(camera_controller.dict())
