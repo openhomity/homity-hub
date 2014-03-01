@@ -76,15 +76,17 @@ class CameraController(HomityObject):
         """Delete camera controller."""
         del self.class_db[self.id]
 
-    def _add_camera(self, camera_name, camera):
+    def _add_camera(self, camera):
         """Add new pin to object."""
         camera_id = uuid4().hex
         self.cameras[camera_id] = {
             'allocated' : False,
             'id' : camera_id,
-            'name' : camera_name,
+            'name' : camera.get('name'),
+            'description' : camera.get('description')
             'on' : camera.get('on'),
             'recording' : camera.get('recording'),
+            'alerts' : camera.get('alerts'),
             'controller' : self.id,
             'location' : self.name
             }
@@ -94,23 +96,20 @@ class CameraController(HomityObject):
         self.driver_class = _driver_name_to_class(self.driver)
         camera_status = self.driver_class.get_cameras(self)
         if not camera_status:
-            self.active = False
+            pass
         else:
-            self.active = True
-            existing_pin_nums_to_ids = ({item.get('num'):item.get('id') for
-                                         item in self.pins.values()})
-            for pin_num, pin in pin_status.items():
-                if pin_num in list(existing_pin_nums_to_ids):
-                    pin_id = existing_pin_nums_to_ids.get(pin_num)
-                    self.pins[pin_id]['digital'] = pin.get('digital')
-                    self.pins[pin_id]['output'] = pin.get('output')
-                    self.pins[pin_id]['location'] = self.name
-                    self.pins[pin_id]['spoke'] = self.id
-                    if pin.get('digital'):
-                        self.pins[pin_id]['status'] = pin.get('on')
-                    else:
-                        self.pins[pin_id]['status'] = pin.get('value')
+            existing_camera_names_to_ids = ({item.get('name'):item.get('id') for
+                                         item in self.cameras.values()})
+            for camera in camera_status:
+                if camera.get('name') in list(existing_camera_names_to_ids):
+                    camera_id = existing_camera_names_to_ids.get(
+                        camera.get('name'))
+                    self.cameras[camera_id]['on'] = camera.get('on')
+                    self.cameras[camera_id]['recording'] = camera.get(
+                        'recording')
+                    self.cameras[camera_id]['alerts'] = camera.get('alerts')
+                    self.cameras[camera_id]['location'] = self.name
+                    self.cameras[camera_id]['controller'] = self.id
                 else:
-                    self._add_pin(pin_num,
-                                  pin)
+                    self._add_camera(camera)
         self.save()

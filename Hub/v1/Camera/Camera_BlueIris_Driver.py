@@ -56,12 +56,17 @@ def _send_command (camera_controller, cmd):
         ret_info = _send_raw_command(driver_info,
                                      json.dumps(cmd))
         if ret_info.get('result') == 'success':
-            return ret_info
+            return ret_info.get('data')
 
     _login(camera_controller)
+    driver_info = _parse_driver_info(camera_controller)
     cmd['session'] = driver_info.get('session')
-    return _send_raw_command(driver_info,
-                             json.dumps(cmd))
+    ret_info = _send_raw_command(driver_info,
+                                     json.dumps(cmd))
+    if ret_info.get('result') == 'success':
+        return ret_info.get('data')
+    else:
+        return None
 
 def _send_raw_command (driver_info, cmd):
     """Send raw BlueIris command."""
@@ -73,15 +78,21 @@ def _send_raw_command (driver_info, cmd):
 
 def _get_cameras(camera_controller):
     """Get all cameras."""
-    data = {}
-    data['cmd'] = "camlist"
-    result = _send_command(camera_controller, data)
-    camera_list = {}
-    for data in result['data']:
-        option_value = data['optionValue']
-        if option_value and 'group' not in data:
-            camera_list[option_value] = {}
-            camera_list[option_value]['on'] = data['isEnabled']
+    raw_cameras = _send_command(camera_controller, {"cmd" : "camlist"})
+    camera_list = []
+
+    for camera in raw_cameras:
+        if (camera['optionValue'] and
+                    'group' not in camera and
+                    camera['optionValue'] != '@index'):
+            camera_list.append({
+                "name" : camera['optionValue'],
+                "on" : camera['isEnabled'],
+                "alerts" : camera['isMotion'],
+                "recording" : camera['isRecording'],
+                "description" : camera['optionDisplay']
+            })
+
     return camera_list
 
 def _get_camera(camera_controller, camera_name):
