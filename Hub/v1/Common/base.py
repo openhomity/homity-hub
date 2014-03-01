@@ -79,7 +79,7 @@ class HomityObject(Document):
                         found.append(obj.dict())
                     else:
                         found.append(obj)
-            except AttributeError:
+            except AttributeError, KeyError:
                 continue
 
         return found
@@ -114,7 +114,7 @@ class HomityObject(Document):
                 if all(value in list(getattr(obj, attr))
                         for (attr, value) in searches):
                     found.append(obj)
-            except AttributeError:
+            except AttributeError, KeyError:
                 continue
 
         return found
@@ -135,7 +135,7 @@ class HomityObject(Document):
                         if all(subobj[attr] == value
                                 for (attr, value) in searches):
                             found.append(subobj)
-                    except AttributeError:
+                    except AttributeError, KeyError:
                         continue
 
         return found
