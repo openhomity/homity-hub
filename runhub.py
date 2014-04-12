@@ -12,7 +12,7 @@ if hub_config.get('ssl_enable'):
 
 def run_server():
     """Enable WSGI access logging via Paste"""
-    app_logged = TransLogger(app)
+    app_logged = TransLogger(app,setup_console_handler=False)
 
     # Mount the WSGI callable object (app) on the root directory
     cherrypy.tree.graft(app_logged, '/')
