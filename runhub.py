@@ -23,9 +23,7 @@ def run_server():
         'engine.autoreload_on': True,
         'log.screen': True,
         'server.socket_port': 5000,
-        'server.socket_host': '0.0.0.0',
-        'log.error_file': hub_config['logger_path'],
-        'log.access_file': hub_config['logger_path']
+        'server.socket_host': '0.0.0.0'
     }
     if hub_config.get('ssl_enable'):
         cherrypy_config['server.ssl_module'] = 'builtin'
