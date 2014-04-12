@@ -28,7 +28,7 @@ def run_server():
     if hub_config.get('ssl_enable'):
         cherrypy_config['server.ssl_module'] = 'builtin'
         cherrypy_config['server.ssl_private_key'] = hub_config.get('ssl_private_key')
-        cherrypy_config['server.ssl_certificate'] = hub_config.get('ssl_private_key')
+        cherrypy_config['server.ssl_certificate'] = hub_config.get('ssl_cert')
 
     cherrypy.config.update(cherrypy_config)
 
