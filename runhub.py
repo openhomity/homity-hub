@@ -23,7 +23,9 @@ def run_server():
         'engine.autoreload_on': True,
         'log.screen': True,
         'server.socket_port': 5000,
-        'server.socket_host': '0.0.0.0'
+        'server.socket_host': '0.0.0.0',
+        'log.error_file': hub_config['logger_path'],
+        'log.access_file': hub_config['logger_path']
     }
     if hub_config.get('ssl_enable'):
         cherrypy_config['server.ssl_module'] = 'builtin'
@@ -37,7 +39,7 @@ def run_server():
     cherrypy.engine.block()
 
 def main():
-    """ Main. """
+    """ Deprecated in favor of CherryPy. """
     if hub_config.get('ssl_enable'):
         context = SSL.Context(SSL.SSLv23_METHOD)
         context.use_privatekey_file(hub_config.get('ssl_private_key'))
