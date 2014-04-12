@@ -18,6 +18,7 @@ def run_server():
     cherrypy.tree.graft(app_logged, '/')
 
     # Set the configuration of the web server
+
     cherrypy_config = {
         'engine.autoreload_on': True,
         'log.screen': True,
@@ -25,10 +26,9 @@ def run_server():
         'server.socket_host': '0.0.0.0'
     }
     if hub_config.get('ssl_enable'):
-        cherrypy_config['server.ssl_module'] = 'pyopenssl'
-        cherrypy_config[''] = 'pyopenssl'
-        cherrypy_config[''] = hub_config.get('ssl_private_key')
-        cherrypy_config[''] = hub_config.get('ssl_private_key')
+        cherrypy_config['server.ssl_module'] = 'builtin'
+        cherrypy_config['server.ssl_private_key'] = hub_config.get('ssl_private_key')
+        cherrypy_config['server.ssl_certificate'] = hub_config.get('ssl_private_key')
 
     cherrypy.config.update(cherrypy_config)
 
