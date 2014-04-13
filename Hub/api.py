@@ -65,6 +65,7 @@ if hub_config['logger_path']:
     app.logger.addHandler(FILE_HANDLER)
 
     LOG = logging.getLogger('werkzeug')
+    LOG = logging.getLogger('wsgi')
     LOG.setLevel(logging.INFO)
     LOG.addHandler(FILE_HANDLER)
 
