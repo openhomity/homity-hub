@@ -21,11 +21,14 @@ class User(HomityObject):
     @classmethod
     def get_user(cls, username):
         """Fetch user object by username."""
+        """
         found, user = cls._find(username=username)
         if found:
             return user
         else:
             return None
+        """
+        return cls.get_id(username)
 
     def change_password(self, password):
         """Change user's PW to password."""
