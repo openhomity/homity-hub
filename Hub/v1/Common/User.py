@@ -8,7 +8,7 @@ class User(HomityObject):
     """DB Class For User."""
     password = TextField()
 
-    def __init__(self, username=None, password=None, **values):
+    def __init__(self, username=None, password="", **values):
         HomityObject.__init__(self, id=username, **values)
         salt = uuid4().hex
         self.password = (sha256(salt.encode() +
