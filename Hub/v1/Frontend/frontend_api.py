@@ -1,6 +1,7 @@
 """
 TBD
 """
+from Hub import app
 from flask import Blueprint, request, make_response
 import json
 
