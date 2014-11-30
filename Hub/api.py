@@ -82,6 +82,8 @@ else:
     couch = Server(url="http://localhost:5984")
 
 @app.route('/', methods=['GET'])
+@requires_auth
 def get_all_status():
     """Placeholder for root get."""
+    return app.send_static_file('index.html')
     return ""
