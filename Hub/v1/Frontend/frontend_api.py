@@ -9,7 +9,7 @@ from Hub.v1.Common.auth import requires_auth
 
 V1FRONTEND = Blueprint('V1FRONTEND', __name__)
 
-@V1FRONTEND.route('/', methods=['GET'])
+@V1FRONTEND.route('/v1', methods=['GET'])
 @requires_auth
 def get_all_status():
     """Placeholder for root get."""
