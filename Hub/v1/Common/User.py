@@ -6,12 +6,10 @@ from hashlib import sha256
 
 class User(HomityObject):
     """DB Class For User."""
-    username = TextField()
     password = TextField()
 
-    def __init__(self, username="", password="", id=None, **values):
-        HomityObject.__init__(self, id=None, **values)
-        self.username = username
+    def __init__(self, username=None, password="", **values):
+        HomityObject.__init__(self, id=username, **values)
         salt = uuid4().hex
         self.password = (sha256(salt.encode() +
                         password.encode()).hexdigest() +
@@ -21,11 +19,7 @@ class User(HomityObject):
     @classmethod
     def get_user(cls, username):
         """Fetch user object by username."""
-        found, user = cls._find(username=username)
-        if found:
-            return user
-        else:
-            return None
+        return cls.get_id(username)
 
     def change_password(self, password):
         """Change user's PW to password."""

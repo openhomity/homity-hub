@@ -49,14 +49,14 @@ def main():
         print "Updating user %s's password" % new_hub_username
         hub_user.change_password(new_hub_password)
         hub_user.save()
-        print ("Successfully updated %s - %s:%s" %
-           (hub_user.id, hub_user.username, hub_user.password))
+        print ("Successfully updated %s:%s" %
+           (hub_user.id, hub_user.password))
     else:
         print "Creating new user %s" % new_hub_username
         hub_user = User(new_hub_username, new_hub_password)
         hub_user.save()
-        print ("Successfully created %s - %s:%s" %
-           (hub_user.id, hub_user.username, hub_user.password))
+        print ("Successfully created %s:%s" %
+           (hub_user.id, hub_user.password))
 
     '''
     Set up config & log files
