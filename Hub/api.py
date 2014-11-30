@@ -4,7 +4,6 @@ Load Homity Config, Start Services
 import logging
 
 from Hub import app
-from Hub.v1.Common.auth import requires_auth
 from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
 from couchdb import Server
 from v1.Common.helpers import bool_or_string
@@ -81,9 +80,3 @@ if hub_config['couch_url']:
 else:
     couch = Server(url="http://localhost:5984")
 
-@app.route('/', methods=['GET'])
-@requires_auth
-def get_all_status():
-    """Placeholder for root get."""
-    return app.send_static_file('index.html')
-    return ""
