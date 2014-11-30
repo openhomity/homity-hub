@@ -4,7 +4,7 @@ Load Homity Config, Start Services
 import logging
 
 from Hub import app
-
+from Hub.v1.Common.auth import requires_auth
 from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
 from couchdb import Server
 from v1.Common.helpers import bool_or_string
